@@ -1,0 +1,221 @@
+<%@ page contentType="text/html;charset=UTF-8" import="com.restaurantManagementSystem.model.*" %>
+<%@ taglib prefix="c" uri="http://java.sun.com/jsp/jstl/core" %>
+<%@ taglib prefix="fmt" uri="http://java.sun.com/jsp/jstl/fmt" %>
+<c:set var="pageTitle" value="Billing"/>
+<%@ include file="/pages/errorpages/header.jsp" %>
+<%@ include file="/pages/errorpages/admin-sidebar.jsp" %>
+
+<div class="ml-60 flex flex-col min-h-screen bg-paper2">
+  <div class="h-16 bg-white border-b border-black/10 flex items-center px-8 sticky top-0 z-20">
+    <span class="text-[14.5px] font-medium text-ink">Billing &amp; Payments</span>
+  </div>
+  <div class="p-8">
+    <div class="grid grid-cols-3 gap-6">
+
+      <!-- Orders to bill (left 2 cols) -->
+      <div class="col-span-2 space-y-5">
+
+        <!-- Unpaid orders list -->
+        <div class="bg-white border border-black/10 rounded-xl overflow-hidden">
+          <div class="px-6 py-4 border-b border-black/10">
+            <span class="text-[13.5px] font-semibold text-ink">Orders Awaiting Payment</span>
+          </div>
+          <table class="w-full text-[13px]">
+            <thead>
+              <tr class="border-b border-black/10">
+                <th class="px-4 py-2.5 text-left text-[10px] uppercase tracking-widest font-semibold text-muted">Order</th>
+                <th class="px-4 py-2.5 text-left text-[10px] uppercase tracking-widest font-semibold text-muted">Table</th>
+                <th class="px-4 py-2.5 text-left text-[10px] uppercase tracking-widest font-semibold text-muted">Status</th>
+                <th class="px-4 py-2.5 text-left text-[10px] uppercase tracking-widest font-semibold text-muted">Action</th>
+              </tr>
+            </thead>
+            <tbody>
+              <c:forEach items="${orders}" var="o">
+                <c:if test="${o.status.name() != 'CANCELLED'}">
+                  <tr class="border-b border-black/5 hover:bg-paper transition-colors">
+                    <td class="px-4 py-3 font-mono text-[11px] text-muted">${o.orderCode}</td>
+                    <td class="px-4 py-3 font-semibold text-ink">${o.tableNumber}</td>
+                    <td class="px-4 py-3"><span class="badge badge-${o.status.name().toLowerCase()}">${o.status}</span></td>
+                    <td class="px-4 py-3">
+                      <button onclick="loadBill(${o.id}, '${o.orderCode}', '${o.tableNumber}')"
+                              class="text-xs bg-forest text-white px-3 py-1.5 rounded hover:bg-forest-md transition-colors">
+                        Generate Bill
+                      </button>
+                    </td>
+                  </tr>
+                </c:if>
+              </c:forEach>
+            </tbody>
+          </table>
+        </div>
+
+        <!-- Bill detail card (shown after selecting an order) -->
+        <div id="billDetailCard" class="hidden bg-white border border-black/10 rounded-xl overflow-hidden">
+          <div class="px-6 py-4 border-b border-black/10 flex items-center justify-between">
+            <span class="text-[13.5px] font-semibold text-ink" id="billCardTitle">Bill — </span>
+            <span class="badge badge-preparing" id="billCardStatus"></span>
+          </div>
+          <table class="w-full text-[13px]">
+            <thead>
+              <tr class="border-b border-black/10">
+                <th class="px-4 py-2.5 text-left text-[10px] uppercase tracking-widest font-semibold text-muted">Item</th>
+                <th class="px-4 py-2.5 text-right text-[10px] uppercase tracking-widest font-semibold text-muted">Amount</th>
+              </tr>
+            </thead>
+            <tbody id="billItemsBody">
+              <tr><td colspan="2" class="px-4 py-6 text-center text-sm text-muted font-light">Select an order above to view items</td></tr>
+            </tbody>
+          </table>
+        </div>
+      </div>
+
+      <!-- Payment panel (right col) — sticky -->
+      <div class="sticky top-20 h-fit">
+        <div class="bg-white border border-black/10 rounded-xl overflow-hidden">
+          <div class="px-5 py-4 border-b border-black/10">
+            <span class="text-[13.5px] font-semibold text-ink">Payment Summary</span>
+          </div>
+          <div class="p-5">
+
+            <!-- Bill totals -->
+            <div id="billTotals" class="mb-5 space-y-1.5">
+              <div class="flex justify-between text-sm text-muted font-light"><span>Subtotal</span><span id="subtotalVal">Rs 0.00</span></div>
+              <div class="flex justify-between text-sm text-muted font-light"><span>VAT (13%)</span><span id="vatVal">Rs 0.00</span></div>
+              <div class="flex justify-between text-sm text-muted font-light"><span>Service (10%)</span><span id="svcVal">Rs 0.00</span></div>
+              <div id="discountRow" class="hidden flex justify-between text-sm text-green-700 font-light"><span>Discount</span><span id="discountVal">−Rs 0.00</span></div>
+            </div>
+
+            <!-- Discount input -->
+            <div class="mb-5">
+              <label class="block text-[10px] uppercase tracking-widest font-semibold text-muted mb-2">Apply Discount (%)</label>
+              <input type="number" id="discountPct" min="0" max="50" placeholder="0"
+                     class="gk-field w-full px-3 py-2 bg-white border border-black/10 rounded text-sm text-ink placeholder-muted2 outline-none"
+                     oninput="recalc()">
+            </div>
+
+            <!-- Grand total -->
+            <div class="flex justify-between items-baseline border-t border-black/18 pt-4 mb-5">
+              <span class="text-sm font-semibold">Grand Total</span>
+              <span class="font-serif text-2xl font-normal text-forest" id="grandTotal">Rs 0.00</span>
+            </div>
+
+            <!-- Payment method -->
+            <div class="mb-5">
+              <label class="block text-[10px] uppercase tracking-widest font-semibold text-muted mb-3">Payment Method</label>
+              <div class="grid grid-cols-3 gap-2">
+                <div onclick="selPay(this,'CASH')"
+                     class="pay-opt selected p-3 rounded border border-forest bg-forest/8 text-center cursor-pointer transition-all">
+                  <div class="text-xl mb-1">💵</div>
+                  <div class="text-xs font-medium text-forest">Cash</div>
+                </div>
+                <div onclick="selPay(this,'ESEWA')"
+                     class="pay-opt p-3 rounded border border-black/16 bg-transparent text-center cursor-pointer transition-all">
+                  <div class="text-xl mb-1">📱</div>
+                  <div class="text-xs font-normal text-muted">eSewa</div>
+                </div>
+                <div onclick="selPay(this,'KHALTI')"
+                     class="pay-opt p-3 rounded border border-black/16 bg-transparent text-center cursor-pointer transition-all">
+                  <div class="text-xl mb-1">💜</div>
+                  <div class="text-xs font-normal text-muted">Khalti</div>
+                </div>
+              </div>
+              <input type="hidden" id="selectedMethod" value="CASH">
+            </div>
+
+            <!-- Process button -->
+            <button id="processBtn" onclick="processPayment()"
+                    class="w-full py-3 bg-forest text-white text-sm font-medium rounded hover:bg-forest-md transition-all"
+                    disabled>
+              Process Payment
+            </button>
+
+            <!-- Success message -->
+            <div id="paySuccess" class="hidden mt-4 bg-green-50 border border-green-200 text-green-800 text-sm px-4 py-3 rounded text-center">
+              ✓ Payment processed successfully!
+            </div>
+          </div>
+        </div>
+      </div>
+
+    </div>
+  </div>
+</div>
+
+<script>
+let currentOrderId = null;
+let currentBillId  = null;
+let subtotal = 0, vatAmt = 0, svcAmt = 0;
+
+function loadBill(orderId, code, tableNum) {
+  currentOrderId = orderId;
+  document.getElementById('billDetailCard').classList.remove('hidden');
+  document.getElementById('billCardTitle').textContent = 'Bill — ' + code + ' · ' + tableNum;
+  // In production: fetch('/admin/billing/items?orderId='+orderId) then populate table
+  // Demo values:
+  const demoItems = [
+    {name:'Butter Chicken ×2', price:960},
+    {name:'Dal Bhat Set ×1',   price:320},
+    {name:'Mango Lassi ×2',    price:280},
+    {name:'Choc. Lava Cake ×1',price:280}
+  ];
+  subtotal = demoItems.reduce((a,i)=>a+i.price,0);
+  document.getElementById('billItemsBody').innerHTML = demoItems.map(i=>
+    `<tr class="border-b border-black/5">
+       <td class="px-4 py-3">${i.name}</td>
+       <td class="px-4 py-3 text-right font-medium">Rs ${i.price.toLocaleString()}.00</td>
+     </tr>`
+  ).join('');
+  recalc();
+  document.getElementById('processBtn').disabled = false;
+  document.getElementById('processBtn').classList.remove('opacity-50','cursor-not-allowed');
+  document.getElementById('billDetailCard').scrollIntoView({behavior:'smooth', block:'start'});
+}
+
+function recalc() {
+  const discPct = parseFloat(document.getElementById('discountPct').value)||0;
+  const discAmt = Math.round(subtotal * discPct/100 * 100)/100;
+  const base = subtotal - discAmt;
+  vatAmt = Math.round(base * 0.13 * 100)/100;
+  svcAmt = Math.round(base * 0.10 * 100)/100;
+  const total = base + vatAmt + svcAmt;
+  document.getElementById('subtotalVal').textContent = 'Rs ' + subtotal.toLocaleString() + '.00';
+  document.getElementById('vatVal').textContent     = 'Rs ' + vatAmt.toFixed(2);
+  document.getElementById('svcVal').textContent     = 'Rs ' + svcAmt.toFixed(2);
+  document.getElementById('grandTotal').textContent = 'Rs ' + total.toLocaleString(undefined,{minimumFractionDigits:2});
+  if(discAmt > 0) {
+    document.getElementById('discountRow').classList.remove('hidden');
+    document.getElementById('discountVal').textContent = '−Rs ' + discAmt.toFixed(2);
+  } else {
+    document.getElementById('discountRow').classList.add('hidden');
+  }
+}
+
+function selPay(el, method) {
+  document.querySelectorAll('.pay-opt').forEach(e => {
+    e.className = e.className.replace(/border-forest|bg-forest\/8/g,'');
+    e.classList.add('border-black/16','bg-transparent');
+    const lbl = e.querySelector('div:last-child');
+    if(lbl) { lbl.className='text-xs font-normal text-muted'; }
+  });
+  el.classList.remove('border-black/16','bg-transparent');
+  el.classList.add('border-forest','bg-forest/8');
+  const lbl = el.querySelector('div:last-child');
+  if(lbl) { lbl.className='text-xs font-medium text-forest'; }
+  document.getElementById('selectedMethod').value = method;
+}
+
+function processPayment() {
+  if(!currentOrderId) return alert('Select an order first.');
+  const btn = document.getElementById('processBtn');
+  btn.textContent = 'Processing…'; btn.disabled=true;
+  // In production: POST to /admin/payment/process
+  setTimeout(()=>{
+    document.getElementById('paySuccess').classList.remove('hidden');
+    btn.textContent = '✓ Paid'; btn.classList.replace('bg-forest','bg-green-700');
+  }, 800);
+}
+</script>
+</body>
+</html>
+
+
