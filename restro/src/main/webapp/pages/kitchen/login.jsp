@@ -3,11 +3,7 @@
 <c:set var="pageTitle" value="Kitchen Login"/>
 <%@ include file="/pages/errorpages/header.jsp" %>
 
-<!-- ╔═════════════════════════════════════════╗
-     ║  VIEW: kitchen/login.jsp                ║
-     ║  Controller: AuthController.java        ║
-     ║  POST → /kitchen/login → /kitchen/display ║
-     ╚═════════════════════════════════════════╝ -->
+
 
 <div class="min-h-screen grid grid-cols-2">
 
@@ -55,7 +51,7 @@
 
       <h2 class="font-serif text-4xl font-normal mb-1">Kitchen<br>Sign In</h2>
       <p class="text-sm font-light text-muted mb-7 leading-relaxed">
-        Enter your Staff ID and tap your 4-digit PIN.
+        Enter your Staff ID and tap your PIN.
       </p>
 
       <c:if test="${not empty error}">
@@ -68,7 +64,7 @@
         <!-- Staff ID field -->
         <div class="mb-5">
           <label class="block text-[10px] uppercase tracking-widest font-semibold text-muted mb-2">Staff ID</label>
-          <input name="username" type="text" placeholder="e.g. KIT-001"
+          <input name="username" type="text" placeholder="e.g. sujal"
                  class="gk-field w-full px-4 py-2.5 bg-white border border-black/10 rounded text-sm text-ink
                         placeholder-muted2 outline-none transition-colors"
                  autocomplete="username" required>
@@ -77,7 +73,7 @@
         <!-- PIN display dots — same card/border style as site -->
         <div class="mb-3">
           <div class="flex items-center justify-between mb-2">
-            <label class="text-[10px] uppercase tracking-widest font-semibold text-muted">4-Digit PIN</label>
+            <label class="text-[10px] uppercase tracking-widest font-semibold text-muted">PIN</label>
             <button type="button" onclick="clearPin()"
                     class="text-[10px] uppercase tracking-widest font-medium text-muted
                            border-b border-black/10 hover:text-forest hover:border-forest transition-colors">
@@ -148,7 +144,7 @@
       <div class="mt-6 p-4 bg-paper2 rounded-lg border border-black/10">
         <p class="text-[9px] uppercase tracking-widest font-bold text-muted2 mb-2">Demo Credentials</p>
         <div class="flex flex-wrap gap-4 text-xs text-muted font-mono">
-          <span>ID: KIT-001</span><span>PIN: 1234</span><span>pass: kitchen123</span>
+          <span>ID: sujal</span><span>PIN: (use keypad or password field)</span><span>pass: kitchen123</span>
         </div>
       </div>
     </div>
@@ -158,7 +154,7 @@
 <script>
 let pin = [];
 function kp(k) {
-  if (pin.length >= 4) return;
+  if (pin.length >= 9) return;
   pin.push(k);
   updateDisplay();
 }
@@ -171,7 +167,7 @@ function clearPin() {
   updateDisplay();
 }
 function updateDisplay() {
-  for (let i = 0; i < 4; i++) {
+  for (let i = 0; i < 9; i++) {
     const d = document.getElementById('pd' + i);
     if (pin[i] !== undefined) {
       d.textContent = '●';

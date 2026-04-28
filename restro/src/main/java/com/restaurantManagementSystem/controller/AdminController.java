@@ -9,6 +9,7 @@ import jakarta.servlet.annotation.WebServlet;
 import jakarta.servlet.http.*;
 import java.io.IOException;
 import java.math.BigDecimal;
+import java.util.List;
 
 ///**
 // * AdminController — handles all admin dashboard pages.
@@ -49,7 +50,7 @@ public class AdminController extends HttpServlet {
 
     @Override
     protected void doGet(HttpServletRequest req, HttpServletResponse resp)
-            throws ServletException, IOException{
+            throws ServletException, IOException {
 
         String path = req.getServletPath();
 
@@ -57,7 +58,12 @@ public class AdminController extends HttpServlet {
             switch (path) {
 
                 case "/admin/dashboard":
-                    req.setAttribute("orders", orderDAO.findActive());
+                    List<Order> activeOrders = orderDAO.findActive();
+                    if (!activeOrders.isEmpty()) {
+                        Order firstOrder = activeOrders.get(0);
+                        firstOrder.setItems(orderDAO.findOrderItems(firstOrder.getId()));
+                    }
+                    req.setAttribute("orders", activeOrders);
                     req.setAttribute("tables", tableDAO.findAll());
                     req.setAttribute("todayRevenue", orderDAO.getTodayRevenue());
                     req.setAttribute("todayOrders", orderDAO.getTodayOrderCount());
@@ -82,7 +88,7 @@ public class AdminController extends HttpServlet {
                     break;
 
                 case "/admin/billing":
-                    req.setAttribute("orders", orderDAO.findAll());
+                    req.setAttribute("orders", orderDAO.findServed());
                     forward(req, resp, "/pages/admin/billing.jsp");
                     break;
 
@@ -108,7 +114,8 @@ public class AdminController extends HttpServlet {
                     break;
 
                 case "/admin/reservations":
-                    req.setAttribute("reservations", new com.restaurantManagementSystem.dao.ReservationDAO().findUpcoming());
+                    req.setAttribute("reservations",
+                            new com.restaurantManagementSystem.dao.ReservationDAO().findUpcoming());
                     forward(req, resp, "/pages/admin/reservations.jsp");
                     break;
 
@@ -178,12 +185,19 @@ public class AdminController extends HttpServlet {
             }
 
             case "update": {
+                String name = req.getParameter("name");
+                String price = req.getParameter("price");
+                if (name == null || name.isBlank() || price == null || price.isBlank()) {
+                    setFlash(req, "error", "Name and price are required.");
+                    break;
+                }
                 int id = Integer.parseInt(req.getParameter("id"));
                 MenuItem item = menuDAO.findById(id);
                 if (item != null) {
-                    item.setName(req.getParameter("name"));
+                    item.setCategoryId(Integer.parseInt(req.getParameter("categoryId")));
+                    item.setName(name.trim());
                     item.setDescription(req.getParameter("description"));
-                    item.setPrice(new BigDecimal(req.getParameter("price")));
+                    item.setPrice(new BigDecimal(price));
                     item.setAvailable("1".equals(req.getParameter("available")));
                     item.setEmoji(req.getParameter("emoji"));
                     menuDAO.update(item);
@@ -319,4 +333,3 @@ public class AdminController extends HttpServlet {
         req.getSession().setAttribute("flash" + Character.toUpperCase(type.charAt(0)) + type.substring(1), message);
     }
 }
-

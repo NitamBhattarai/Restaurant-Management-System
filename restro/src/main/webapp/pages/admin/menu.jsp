@@ -64,7 +64,7 @@
               </td>
               <td class="px-4 py-3">
                 <div class="flex gap-2">
-                  <button onclick="openEditModal(${item.id},'${item.name}','${item.categoryId}','${item.price}','${item.emoji}','${item.available}')"
+                  <button onclick="openEditModal(${item.id},'${item.name}',${item.categoryId},${item.price},'${item.emoji}',${item.available},'${item.description}')"
                           class="text-xs border border-black/16 px-3 py-1.5 rounded hover:border-forest hover:text-forest transition-all">Edit</button>
                   <form method="POST" action="${pageContext.request.contextPath}/admin/menu"
                         onsubmit="return confirm('Remove this item?')" style="display:inline">
@@ -84,7 +84,61 @@
   </div>
 </div>
 
-<!-- ADD ITEM MODAL -->
+<!-- EDIT ITEM MODAL -->
+<div id="editModal" class="hidden fixed inset-0 bg-ink/45 z-50 flex items-center justify-center">
+  <div class="bg-white rounded-2xl p-8 max-w-md w-full mx-4 shadow-xl">
+    <div class="flex items-center justify-between mb-6">
+      <h3 class="font-serif text-2xl font-normal">Edit Menu Item</h3>
+      <button onclick="document.getElementById('editModal').classList.add('hidden')" class="text-muted hover:text-ink text-xl">✕</button>
+    </div>
+    <form method="POST" action="${pageContext.request.contextPath}/admin/menu">
+      <input type="hidden" name="action" value="update">
+      <input type="hidden" name="id" id="editId">
+      <div class="grid grid-cols-2 gap-4 mb-4">
+        <div>
+          <label class="block text-[10px] uppercase tracking-widest font-semibold text-muted mb-2">Item Name</label>
+          <input name="name" id="editName" type="text" placeholder="e.g. Truffle Risotto" required
+                 class="gk-field w-full px-3 py-2 bg-white border border-black/10 rounded text-sm text-ink placeholder-muted2 outline-none">
+        </div>
+        <div>
+          <label class="block text-[10px] uppercase tracking-widest font-semibold text-muted mb-2">Category</label>
+          <select name="categoryId" id="editCategoryId" class="gk-field w-full px-3 py-2 bg-white border border-black/10 rounded text-sm text-ink outline-none">
+            <c:forEach items="${categories}" var="cat">
+              <option value="${cat.id}">${cat.name}</option>
+            </c:forEach>
+          </select>
+        </div>
+      </div>
+      <div class="grid grid-cols-2 gap-4 mb-4">
+        <div>
+          <label class="block text-[10px] uppercase tracking-widest font-semibold text-muted mb-2">Price (Rs)</label>
+          <input name="price" id="editPrice" type="number" step="0.01" placeholder="480" required
+                 class="gk-field w-full px-3 py-2 bg-white border border-black/10 rounded text-sm text-ink placeholder-muted2 outline-none">
+        </div>
+        <div>
+          <label class="block text-[10px] uppercase tracking-widest font-semibold text-muted mb-2">Emoji</label>
+          <input name="emoji" id="editEmoji" type="text" placeholder="🍝"
+                 class="gk-field w-full px-3 py-2 bg-white border border-black/10 rounded text-sm text-ink placeholder-muted2 outline-none">
+        </div>
+      </div>
+      <div class="mb-4">
+        <label class="block text-[10px] uppercase tracking-widest font-semibold text-muted mb-2">Description</label>
+        <textarea name="description" id="editDescription" rows="2" placeholder="Brief tasting note…"
+                  class="gk-field w-full px-3 py-2 bg-white border border-black/10 rounded text-sm text-ink placeholder-muted2 outline-none resize-y"></textarea>
+      </div>
+      <div class="mb-6">
+        <label class="block text-[10px] uppercase tracking-widest font-semibold text-muted mb-2">Available</label>
+        <input type="checkbox" name="available" id="editAvailable" value="1" checked>
+      </div>
+      <div class="flex gap-3 justify-end">
+        <button type="button" onclick="document.getElementById('editModal').classList.add('hidden')"
+                class="text-sm border border-black/16 px-5 py-2 rounded hover:border-forest hover:text-forest transition-all">Cancel</button>
+        <button type="submit"
+                class="text-sm bg-forest text-white px-5 py-2 rounded hover:bg-forest-md transition-colors">Update Item</button>
+      </div>
+    </form>
+  </div>
+</div>
 <div id="addModal" class="hidden fixed inset-0 bg-ink/45 z-50 flex items-center justify-center">
   <div class="bg-white rounded-2xl p-8 max-w-md w-full mx-4 shadow-xl">
     <div class="flex items-center justify-between mb-6">
@@ -137,8 +191,15 @@
 
 <script>
 function openAddModal() { document.getElementById('addModal').classList.remove('hidden'); }
-function openEditModal(id, name, catId, price, emoji, available) {
-  alert('Edit modal for item ' + id + ' — in production this pre-fills the form via AJAX.');
+function openEditModal(id, name, catId, price, emoji, available, description) {
+  document.getElementById('editId').value = id;
+  document.getElementById('editName').value = name;
+  document.getElementById('editCategoryId').value = catId;
+  document.getElementById('editPrice').value = price;
+  document.getElementById('editEmoji').value = emoji;
+  document.getElementById('editDescription').value = description;
+  document.getElementById('editAvailable').checked = available;
+  document.getElementById('editModal').classList.remove('hidden');
 }
 function filterMenu() {
   const s = document.getElementById('menuSearch').value.toLowerCase();

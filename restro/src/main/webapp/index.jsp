@@ -1,6 +1,6 @@
-<%@ page contentType="text/html;charset=UTF-8" %>
-<%@ taglib prefix="c" uri="http://java.sun.com/jsp/jstl/core" %>
-<c:set var="pageTitle" value="Home - Gokyo Bistro"/>
+<%@ page contentType="text/html;charset=UTF-8" %> <%@ taglib prefix="c"
+uri="http://java.sun.com/jsp/jstl/core" %>
+<c:set var="pageTitle" value="Home - Gokyo Bistro" />
 <%@ include file="/pages/errorpages/header.jsp" %>
 
 <style>
@@ -72,8 +72,16 @@
     min-height: 76vh;
     overflow: hidden;
     background:
-      radial-gradient(circle at 74% 28%, rgba(45, 120, 90, 0.18), transparent 22%),
-      radial-gradient(circle at 76% 22%, rgba(188, 223, 206, 0.08), transparent 42%),
+      radial-gradient(
+        circle at 74% 28%,
+        rgba(45, 120, 90, 0.18),
+        transparent 22%
+      ),
+      radial-gradient(
+        circle at 76% 22%,
+        rgba(188, 223, 206, 0.08),
+        transparent 42%
+      ),
       linear-gradient(180deg, rgba(3, 48, 37, 0.88), rgba(2, 49, 38, 0.94)),
       #032e24;
     border-radius: 0;
@@ -88,8 +96,14 @@
     width: 620px;
     height: 620px;
     border-radius: 50%;
-    background:
-      radial-gradient(circle at 48% 48%, rgba(20, 59, 47, 0.2) 0 34%, rgba(8, 37, 29, 0.45) 34% 43%, rgba(5, 29, 23, 0.86) 43% 58%, rgba(3, 23, 18, 0.96) 58% 67%, transparent 67%);
+    background: radial-gradient(
+      circle at 48% 48%,
+      rgba(20, 59, 47, 0.2) 0 34%,
+      rgba(8, 37, 29, 0.45) 34% 43%,
+      rgba(5, 29, 23, 0.86) 43% 58%,
+      rgba(3, 23, 18, 0.96) 58% 67%,
+      transparent 67%
+    );
     opacity: 0.82;
   }
 
@@ -101,8 +115,11 @@
     width: 176px;
     height: 104px;
     border-radius: 0 0 90px 90px;
-    background:
-      linear-gradient(160deg, rgba(193, 150, 120, 0.95), rgba(117, 72, 52, 0.96));
+    background: linear-gradient(
+      160deg,
+      rgba(193, 150, 120, 0.95),
+      rgba(117, 72, 52, 0.96)
+    );
     box-shadow: 0 22px 28px rgba(0, 0, 0, 0.18);
     transform: rotate(-21deg);
     opacity: 0.92;
@@ -200,7 +217,11 @@
     height: 460px;
     background:
       linear-gradient(180deg, rgba(0, 0, 0, 0.2), rgba(0, 0, 0, 0.28)),
-      radial-gradient(circle at 50% 24%, rgba(211, 160, 121, 0.34), transparent 28%),
+      radial-gradient(
+        circle at 50% 24%,
+        rgba(211, 160, 121, 0.34),
+        transparent 28%
+      ),
       linear-gradient(145deg, #5e3d2b, #171210);
     overflow: hidden;
   }
@@ -212,7 +233,13 @@
     width: 230px;
     height: 230px;
     border-radius: 50%;
-    background: radial-gradient(circle at 50% 48%, rgba(255, 255, 255, 0.98), rgba(229, 223, 216, 0.9) 56%, rgba(164, 155, 146, 0.64) 78%, rgba(93, 84, 76, 0.4) 100%);
+    background: radial-gradient(
+      circle at 50% 48%,
+      rgba(255, 255, 255, 0.98),
+      rgba(229, 223, 216, 0.9) 56%,
+      rgba(164, 155, 146, 0.64) 78%,
+      rgba(93, 84, 76, 0.4) 100%
+    );
     box-shadow: 0 22px 30px rgba(0, 0, 0, 0.18);
   }
 
@@ -299,7 +326,12 @@
   .curator-left {
     min-height: 620px;
     background:
-      radial-gradient(circle at 46% 44%, rgba(160, 175, 176, 0.8), rgba(34, 48, 52, 0.96) 58%, rgba(13, 24, 27, 1) 76%),
+      radial-gradient(
+        circle at 46% 44%,
+        rgba(160, 175, 176, 0.8),
+        rgba(34, 48, 52, 0.96) 58%,
+        rgba(13, 24, 27, 1) 76%
+      ),
       linear-gradient(160deg, #222f34, #101718);
   }
 
@@ -349,7 +381,11 @@
   .curator-right-top {
     min-height: 300px;
     background:
-      radial-gradient(circle at 58% 40%, rgba(210, 214, 209, 0.54), transparent 24%),
+      radial-gradient(
+        circle at 58% 40%,
+        rgba(210, 214, 209, 0.54),
+        transparent 24%
+      ),
       linear-gradient(180deg, #201a17, #0d1012);
   }
 
@@ -541,31 +577,92 @@
 <div class="home-shell">
   <header class="topbar">
     <a href="${pageContext.request.contextPath}/" class="brand">Gokyo Bistro</a>
-    <nav class="nav-links">
-      <a href="${pageContext.request.contextPath}/" class="nav-link active">Home</a>
-      <a href="${pageContext.request.contextPath}/customer/menu" class="nav-link">Menu</a>
-      <a href="${pageContext.request.contextPath}/customer/scan" class="nav-link">Scan QR</a>
-      <a href="${pageContext.request.contextPath}/admin/login" class="nav-link">Admin</a>
-    </nav>
-    <div class="nav-actions">
-      <span class="nav-icon">o</span>
-      <span class="nav-icon">o</span>
-      <a href="${pageContext.request.contextPath}/admin/login" class="nav-link">Login</a>
-      <a href="${pageContext.request.contextPath}/customer/scan" class="btn-primary" style="padding: 12px 18px;">Scan QR</a>
-    </div>
+    <c:choose>
+      <c:when test="${not empty sessionScope.currentUser}">
+        <nav class="nav-links">
+          <a
+            href="${pageContext.request.contextPath}/admin/dashboard"
+            class="nav-link active"
+            >Dashboard</a
+          >
+        </nav>
+        <div class="nav-actions">
+          <span class="nav-icon">o</span>
+          <span class="nav-icon">o</span>
+          <form
+            method="POST"
+            action="${pageContext.request.contextPath}/admin/logout"
+            style="display: inline"
+          >
+            <button
+              type="submit"
+              class="nav-link"
+              style="background: none; border: none; cursor: pointer"
+            >
+              Logout
+            </button>
+          </form>
+        </div>
+      </c:when>
+      <c:otherwise>
+        <nav class="nav-links">
+          <a href="${pageContext.request.contextPath}/" class="nav-link active"
+            >Home</a
+          >
+          <a
+            href="${pageContext.request.contextPath}/customer/menu"
+            class="nav-link"
+            >Menu</a
+          >
+          <a
+            href="${pageContext.request.contextPath}/customer/scan"
+            class="nav-link"
+            >Scan QR</a
+          >
+          <a
+            href="${pageContext.request.contextPath}/admin/login"
+            class="nav-link"
+            >Admin</a
+          >
+        </nav>
+        <div class="nav-actions">
+          <span class="nav-icon">o</span>
+          <span class="nav-icon">o</span>
+          <a
+            href="${pageContext.request.contextPath}/admin/login"
+            class="nav-link"
+            >Login</a
+          >
+          <a
+            href="${pageContext.request.contextPath}/customer/scan"
+            class="btn-primary"
+            style="padding: 12px 18px"
+            >Scan QR</a
+          >
+        </div>
+      </c:otherwise>
+    </c:choose>
   </header>
 
   <section class="hero">
     <div class="hero-copy">
       <p class="eyebrow">Established in the Himalayas</p>
-      <h1>Plated<br>Perfection</h1>
+      <h1>Plated<br />Perfection</h1>
       <p>
-        A culinary sanctuary where Himalayan ingredients meet avant garde technique.
-        Experience the art of mindful gastronomy.
+        A culinary sanctuary where Himalayan ingredients meet avant garde
+        technique. Experience the art of mindful gastronomy.
       </p>
       <div class="hero-actions">
-        <a href="${pageContext.request.contextPath}/customer/menu" class="btn-primary">Explore Menu</a>
-        <a href="${pageContext.request.contextPath}/customer/scan" class="btn-secondary">Scan QR</a>
+        <a
+          href="${pageContext.request.contextPath}/customer/menu"
+          class="btn-primary"
+          >Explore Menu</a
+        >
+        <a
+          href="${pageContext.request.contextPath}/customer/scan"
+          class="btn-secondary"
+          >Scan QR</a
+        >
       </div>
     </div>
   </section>
@@ -577,14 +674,23 @@
         <div class="story-badge">The Gokyo Standard</div>
       </div>
       <div class="story-copy">
-        <h2>The Philosophy of<br>Intentional Dining</h2>
+        <h2>The Philosophy of<br />Intentional Dining</h2>
         <p>
-          At Gokyo Bistro, we believe that every ingredient carries a narrative. Our plating begins at the source, from peak mountain produce to heritage grains and clarified butter patiently prepared in house.
+          At Gokyo Bistro, we believe that every ingredient carries a narrative.
+          Our plating begins at the source, from peak mountain produce to
+          heritage grains and clarified butter patiently prepared in house.
         </p>
         <p>
-          Masterful design is our cornerstone. In the rhythm of the kitchen, every leaf is placed with care, every reduction balanced with restraint, and every course composed to feel generous, calm, and deeply memorable.
+          Masterful design is our cornerstone. In the rhythm of the kitchen,
+          every leaf is placed with care, every reduction balanced with
+          restraint, and every course composed to feel generous, calm, and
+          deeply memorable.
         </p>
-        <a href="${pageContext.request.contextPath}/customer/scan" class="story-link">Learn about our sourcing <span>→</span></a>
+        <a
+          href="${pageContext.request.contextPath}/customer/scan"
+          class="story-link"
+          >Learn about our sourcing <span>→</span></a
+        >
       </div>
     </div>
   </section>
@@ -601,20 +707,20 @@
       <div class="curator-stack">
         <article class="curator-right-top">
           <div class="curator-caption">
-            <h3 style="font-size:24px;">River Crab Infusion</h3>
+            <h3 style="font-size: 24px">River Crab Infusion</h3>
             <div class="price-chip">Rs 3,300</div>
           </div>
         </article>
         <div class="curator-right-bottom">
           <article class="curator-small pink">
             <div class="curator-caption">
-              <h3 style="font-size:21px;">Silken Torte</h3>
+              <h3 style="font-size: 21px">Silken Torte</h3>
               <div class="price-chip">Rs 950</div>
             </div>
           </article>
           <article class="curator-small amber">
             <div class="curator-caption">
-              <h3 style="font-size:21px;">Golden Highball</h3>
+              <h3 style="font-size: 21px">Golden Highball</h3>
               <div class="price-chip">Rs 1,250</div>
             </div>
           </article>
@@ -627,11 +733,17 @@
     <div class="newsletter-mark">✦</div>
     <h2 class="newsletter-title">Join the Inner Circle</h2>
     <p class="newsletter-copy">
-      Receive early access to seasonal tasting menus, chef residencies, and exclusive cellar previews.
-      Become part of Gokyo Bistro's culinary world.
+      Receive early access to seasonal tasting menus, chef residencies, and
+      exclusive cellar previews. Become part of Gokyo Bistro's culinary world.
     </p>
-    <form class="newsletter-form" onsubmit="event.preventDefault(); window.location='${pageContext.request.contextPath}/customer/scan';">
-      <input type="email" placeholder="Enter your email">
+    <form
+      class="newsletter-form"
+      onsubmit="
+        event.preventDefault();
+        window.location = '${pageContext.request.contextPath}/customer/scan';
+      "
+    >
+      <input type="email" placeholder="Enter your email" />
       <button type="submit" class="newsletter-btn">Subscribe</button>
     </form>
   </section>
@@ -640,7 +752,10 @@
     <div class="footer-grid">
       <div>
         <div class="footer-brand">Gokyo Bistro</div>
-        <div>Elevating Himalayan ingredients through composed modern tasting menus and warm hospitality.</div>
+        <div>
+          Elevating Himalayan ingredients through composed modern tasting menus
+          and warm hospitality.
+        </div>
       </div>
       <div>
         <div class="footer-title">Connect</div>

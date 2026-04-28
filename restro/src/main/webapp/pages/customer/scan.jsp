@@ -11,7 +11,10 @@
 --%>
 
 <nav class="sticky top-0 z-50 h-16 flex items-center justify-between px-6 bg-paper/96 backdrop-blur-md border-b border-black/10">
-  <a href="${pageContext.request.contextPath}/" class="font-serif text-xl font-bold text-ink">Gokyo Bistro</a>
+  <div class="flex items-center gap-4">
+    <a href="${pageContext.request.contextPath}/" class="font-serif text-xl font-bold text-ink hover:text-forest transition-colors">Gokyo Bistro</a>
+    <a href="${pageContext.request.contextPath}/" class="text-sm text-muted hover:text-ink transition-colors">← Back</a>
+  </div>
   <span class="text-xs font-semibold uppercase tracking-widest bg-forest/8 border border-forest/14 text-forest px-3 py-1.5 rounded-full">Guest Portal</span>
 </nav>
 
