@@ -56,7 +56,9 @@ public class AuthFilter implements Filter {
         if (path.startsWith("/admin") && user.getRole() == User.Role.ADMIN) {
             allowed = true;
         } else if (path.startsWith("/kitchen")
-                && (user.getRole() == User.Role.KITCHEN || user.getRole() == User.Role.ADMIN)) {
+                && (user.getRole() == User.Role.KITCHEN
+                || user.getRole() == User.Role.STAFF
+                || user.getRole() == User.Role.ADMIN)) {
             allowed = true;
         } else if (path.startsWith("/staff")
                 && (user.getRole() == User.Role.STAFF || user.getRole() == User.Role.ADMIN)) {

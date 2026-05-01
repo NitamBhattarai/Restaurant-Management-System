@@ -1,5 +1,5 @@
 <%@ page contentType="text/html;charset=UTF-8" import="com.restaurantManagementSystem.model.*" %>
-<%@ taglib prefix="c" uri="http://java.sun.com/jsp/jstl/core" %>
+<%@ taglib prefix="c" uri="http://xmlns.jcp.org/jsp/jstl/core" %>
 <%@ taglib prefix="fmt" uri="http://java.sun.com/jsp/jstl/fmt" %>
 <c:set var="pageTitle" value="Menu Management"/>
 <%@ include file="/pages/errorpages/header.jsp" %>

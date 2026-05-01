@@ -1,5 +1,5 @@
 <%@ page contentType="text/html;charset=UTF-8" %>
-<%@ taglib prefix="c" uri="http://java.sun.com/jsp/jstl/core" %>
+<%@ taglib prefix="c" uri="http://xmlns.jcp.org/jsp/jstl/core" %>
 <c:set var="pageTitle" value="Admin Login"/>
 <%@ include file="/pages/errorpages/header.jsp" %>
 

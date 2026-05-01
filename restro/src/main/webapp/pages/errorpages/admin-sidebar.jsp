@@ -1,4 +1,4 @@
-<%@ taglib prefix="c" uri="http://java.sun.com/jsp/jstl/core" %>
+<%@ taglib prefix="c" uri="http://xmlns.jcp.org/jsp/jstl/core" %>
 <%
   String cp = request.getContextPath();
   String path = request.getServletPath();
@@ -41,7 +41,7 @@
     <a href="<%=cp%>/admin/payments"
        class="flex items-center gap-3 px-5 py-3 text-[15px] font-medium text-ink2 border-r-[3px] <%=path.equals("/admin/payments") ? "bg-[#eef8f4] border-forest text-forest" : "border-transparent hover:bg-paper2"%>">
       <span class="text-sm">☰</span>
-      <span>Feedbacks</span>
+      <span>Payments</span>
     </a>
   </nav>
 

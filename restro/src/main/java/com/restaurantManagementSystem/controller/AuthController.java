@@ -21,7 +21,8 @@ import java.io.IOException;
  *
  * MVC Role: Controller
  */
-@WebServlet(name = "AuthController", urlPatterns = { "/admin/login", "/admin/logout" })
+@WebServlet(name = "AuthController", urlPatterns = { "/admin/login", "/admin/logout", "/kitchen/login",
+        "/kitchen/logout" })
 public class AuthController extends HttpServlet {
 
     private final UserDAO userDAO = new UserDAO();
@@ -54,7 +55,11 @@ public class AuthController extends HttpServlet {
         }
 
         // Show login form
-        req.getRequestDispatcher("/pages/admin/login.jsp").forward(req, resp);
+        if (path.startsWith("/kitchen")) {
+            req.getRequestDispatcher("/pages/kitchen/login.jsp").forward(req, resp);
+        } else {
+            req.getRequestDispatcher("/pages/admin/login.jsp").forward(req, resp);
+        }
     }
 
     @Override
@@ -100,28 +105,17 @@ public class AuthController extends HttpServlet {
                 return;
             }
 
-            // Role enforcement
-            if (path.startsWith("/kitchen") && user.getRole() == User.Role.STAFF) {
-                req.setAttribute("error", "Admin or kitchen staff access required.");
-                req.getRequestDispatcher("/pages/kitchen/login.jsp").forward(req, resp);
-                return;
-            }
-            if (!path.startsWith("/kitchen") && user.getRole() == User.Role.KITCHEN) {
-                req.setAttribute("error", "Admin or staff access required for this portal.");
-                req.getRequestDispatcher("/pages/admin/login.jsp").forward(req, resp);
-                return;
-            }
-
             // Create session
             HttpSession session = req.getSession(true);
             session.setAttribute("currentUser", user);
             session.setMaxInactiveInterval(60 * 60 * 8); // 8 hours
 
-            // Redirect based on role
-            if (user.getRole() == User.Role.KITCHEN) {
-                resp.sendRedirect(context + "/kitchen/display");
-            } else {
+            // Redirect based on role - both STAFF and KITCHEN go to kitchen display
+            if (user.getRole() == User.Role.ADMIN) {
                 resp.sendRedirect(context + "/admin/dashboard");
+            } else {
+                // Both STAFF and KITCHEN roles redirect to kitchen display
+                resp.sendRedirect(context + "/kitchen/display");
             }
 
         } catch (Exception e) {

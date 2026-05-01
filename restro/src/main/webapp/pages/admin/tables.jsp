@@ -1,6 +1,6 @@
 <%-- ═══════════════════════════════════════════ TABLES JSP ═══ --%>
-<%@ page contentType="text/html;charset=UTF-8" import="com.gokyo.model.*" %>
-<%@ taglib prefix="c" uri="http://java.sun.com/jsp/jstl/core" %>
+<%@ page contentType="text/html;charset=UTF-8" import="com.restaurantManagementSystem.model.*" %>
+<%@ taglib prefix="c" uri="http://xmlns.jcp.org/jsp/jstl/core" %>
 <c:set var="pageTitle" value="Tables"/>
 <%@ include file="/pages/errorpages/header.jsp" %>
 <%@ include file="/pages/errorpages/admin-sidebar.jsp" %>
