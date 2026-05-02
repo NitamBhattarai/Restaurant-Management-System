@@ -17,7 +17,7 @@ import java.util.List;
  *
  * MVC Role: Controller
  */
-public class KitchenController extends HttpServlet {
+public class KitchenServlet extends HttpServlet {
 
     private final OrderDAO orderDAO = new OrderDAO();
 

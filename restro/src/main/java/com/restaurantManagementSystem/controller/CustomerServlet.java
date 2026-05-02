@@ -20,7 +20,7 @@ import java.math.BigDecimal;
 import java.util.ArrayList;
 import java.util.List;
 
-public class CustomerController extends HttpServlet {
+public class CustomerServlet extends HttpServlet {
 
     private final MenuItemDAO menuDAO = new MenuItemDAO();
     private final TableDAO tableDAO = new TableDAO();

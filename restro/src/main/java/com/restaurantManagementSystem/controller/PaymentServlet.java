@@ -39,7 +39,7 @@ import java.math.BigDecimal;
  *
  * MVC Role: Controller
  */
-public class PaymentController extends HttpServlet {
+public class PaymentServlet extends HttpServlet {
 
     private final PaymentDAO paymentDAO = new PaymentDAO();
     private final BillDAO billDAO = new BillDAO();

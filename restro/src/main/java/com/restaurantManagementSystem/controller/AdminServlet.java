@@ -38,7 +38,7 @@ import java.util.UUID;
 // * MVC Role: Controller
 // */
 @jakarta.servlet.annotation.MultipartConfig(maxFileSize = 5242880, maxRequestSize = 10485760)
-public class AdminController extends HttpServlet {
+public class AdminServlet extends HttpServlet {
 
 
     // ── DAOs (Model layer) ────────────────────────────────
@@ -416,7 +416,7 @@ public class AdminController extends HttpServlet {
             feedback.setServiceRating(rating(req, "serviceRating"));
             feedback.setAmbienceRating(rating(req, "ambienceRating"));
             feedback.setOverallRating(rating(req, "overallRating"));
-            feedback.setComments(required(req, "comments", "Feedback comments are required."));
+             feedback.setComments(required(req, "comments", "Feedback comments are required."));
             feedbackDAO.create(feedback);
             setFlash(req, "success", "Feedback added for " + feedback.getGuestName() + ".");
         }

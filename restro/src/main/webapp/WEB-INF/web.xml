@@ -49,7 +49,7 @@
     <!-- ── Servlet mappings ── -->
     <servlet>
         <servlet-name>AuthController</servlet-name>
-        <servlet-class>com.restaurantManagementSystem.controller.AuthController</servlet-class>
+        <servlet-class>com.restaurantManagementSystem.controller.AuthServlet</servlet-class>
     </servlet>
     <servlet-mapping>
         <servlet-name>AuthController</servlet-name>
@@ -61,7 +61,7 @@
 
     <servlet>
         <servlet-name>AdminController</servlet-name>
-        <servlet-class>com.restaurantManagementSystem.controller.AdminController</servlet-class>
+        <servlet-class>com.restaurantManagementSystem.controller.AdminServlet</servlet-class>
         <multipart-config>
             <max-file-size>5242880</max-file-size>
             <max-request-size>6291456</max-request-size>
@@ -95,7 +95,7 @@
 
     <servlet>
         <servlet-name>KitchenController</servlet-name>
-        <servlet-class>com.restaurantManagementSystem.controller.KitchenController</servlet-class>
+        <servlet-class>com.restaurantManagementSystem.controller.KitchenServlet</servlet-class>
     </servlet>
     <servlet-mapping>
         <servlet-name>KitchenController</servlet-name>
@@ -105,7 +105,7 @@
 
     <servlet>
         <servlet-name>CustomerController</servlet-name>
-        <servlet-class>com.restaurantManagementSystem.controller.CustomerController</servlet-class>
+        <servlet-class>com.restaurantManagementSystem.controller.CustomerServlet</servlet-class>
     </servlet>
     <servlet-mapping>
         <servlet-name>CustomerController</servlet-name>
@@ -117,7 +117,7 @@
 
     <servlet>
         <servlet-name>PaymentController</servlet-name>
-        <servlet-class>com.restaurantManagementSystem.controller.PaymentController</servlet-class>
+        <servlet-class>com.restaurantManagementSystem.controller.PaymentServlet</servlet-class>
     </servlet>
     <servlet-mapping>
         <servlet-name>PaymentController</servlet-name>

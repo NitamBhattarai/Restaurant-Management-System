@@ -20,7 +20,7 @@ import java.io.IOException;
  *
  * MVC Role: Controller
  */
-public class AuthController extends HttpServlet {
+public class AuthServlet extends HttpServlet {
 
     private final UserDAO userDAO = new UserDAO();
 
