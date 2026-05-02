@@ -11,7 +11,7 @@ uri="jakarta.tags.core" %>
     <!-- Google Fonts: Playfair Display + Jost -->
     <link rel="preconnect" href="https://fonts.googleapis.com" />
     <link
-      href="https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,400;0,500;0,700;1,400;1,500&family=Jost:wght@300;400;500;600&display=swap"
+      href="https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,400;0,500;0,600;0,700;1,400;1,500&family=Inter:wght@300;400;500;600;700&display=swap"
       rel="stylesheet"
     />
     <script>
@@ -20,24 +20,24 @@ uri="jakarta.tags.core" %>
           extend: {
             colors: {
               forest: {
-                DEFAULT: "#1a3a2e",
-                md: "#234d3c",
-                lt: "#2d6147",
-                dim: "rgba(26,58,46,0.07)",
-                dim2: "rgba(26,58,46,0.14)",
+                DEFAULT: "#114b3e",
+                md: "#0e3b31",
+                lt: "#186654",
+                dim: "rgba(17,75,62,0.07)",
+                dim2: "rgba(17,75,62,0.14)",
               },
-              paper: "#f5f3ef",
-              paper2: "#efede9",
-              paper3: "#e8e5df",
-              ink: "#1a1a18",
-              ink2: "#2e2d2b",
-              muted: "#7a7870",
-              muted2: "#a8a49c",
-              gold: "#c4973a",
+              paper: "#fbfbfb",
+              paper2: "#f6f8f7",
+              paper3: "#eef0f0",
+              ink: "#111827",
+              ink2: "#374151",
+              muted: "#6b7280",
+              muted2: "#9ca3af",
+              gold: "#f5a623",
             },
             fontFamily: {
               serif: ['"Playfair Display"', "Georgia", "serif"],
-              sans: ["Jost", "sans-serif"],
+              sans: ["Inter", "sans-serif"],
             },
           },
         },
@@ -45,9 +45,9 @@ uri="jakarta.tags.core" %>
     </script>
     <style>
       body {
-        font-family: "Jost", sans-serif;
-        background-color: #f5f3ef;
-        color: #1a1a18;
+        font-family: "Inter", sans-serif;
+        background-color: #fbfbfb;
+        color: #111827;
       }
       .font-serif {
         font-family: "Playfair Display", Georgia, serif;
@@ -92,15 +92,15 @@ uri="jakarta.tags.core" %>
       }
       /* Sidebar active link */
       .sb-active {
-        color: #1a3a2e !important;
-        background: rgba(26, 58, 46, 0.07) !important;
-        border-left-color: #1a3a2e !important;
+        color: #114b3e !important;
+        background: #eef8f4 !important;
+        border-left-color: #114b3e !important;
         font-weight: 500 !important;
       }
       /* Form field focus */
       .gk-field:focus {
         outline: none;
-        border-color: #1a3a2e !important;
+        border-color: #114b3e !important;
       }
       /* Animation */
       @keyframes fadeUp {

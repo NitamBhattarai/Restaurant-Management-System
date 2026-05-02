@@ -137,24 +137,34 @@
 </div>
 
 <script>
+  const orderItemsData = {};
+  <c:forEach items="${orders}" var="o">
+    orderItemsData[${o.id}] = [
+      <c:forEach items="${o.items}" var="i">
+        { name: '<c:out value="${i.menuItemName}"/>', qty: ${i.quantity}, price: ${i.lineTotal} },
+      </c:forEach>
+    ];
+  </c:forEach>
+
+  const orderBillData = {
+    <c:forEach items="${billMap}" var="entry">
+      ${entry.key}: ${entry.value},
+    </c:forEach>
+  };
+
   let currentOrderId = null;
   let currentBillId  = null;
   let subtotal = 0, vatAmt = 0, svcAmt = 0;
 
   function loadBill(orderId, code, tableNum) {
     currentOrderId = orderId;
+    currentBillId = orderBillData[orderId];
     document.getElementById('billDetailCard').classList.remove('hidden');
     document.getElementById('billCardTitle').textContent = 'Bill — ' + code + ' · ' + tableNum;
-    // In production: fetch('/admin/billing/items?orderId='+orderId) then populate table
-    // Demo values:
-    const demoItems = [
-      {name:'Butter Chicken', qty:2, price:960},
-      {name:'Dal Bhat Set',   qty:1, price:320},
-      {name:'Mango Lassi',    qty:2, price:280},
-      {name:'Choc. Lava Cake',qty:1, price:280}
-    ];
-    subtotal = demoItems.reduce((a,i)=>a+i.price,0);
-    document.getElementById('billItemsBody').innerHTML = demoItems.map(i=>
+    
+    const items = orderItemsData[orderId] || [];
+    subtotal = items.reduce((a,i)=>a+i.price,0);
+    document.getElementById('billItemsBody').innerHTML = items.map(i=>
             `<tr class="border-b border-black/5">
        <td class="px-6 py-3">${i.name}</td>
        <td class="px-6 py-3 text-right text-muted">×${i.qty}</td>
@@ -201,14 +211,38 @@
   }
 
   function processPayment() {
-    if(!currentOrderId) return alert('Select an order first.');
+    if(!currentOrderId || !currentBillId) return alert('Select an order first.');
     const btn = document.getElementById('processBtn');
     btn.textContent = 'Processing…'; btn.disabled=true;
-    // In production: POST to /admin/payment/process
-    setTimeout(()=>{
-      document.getElementById('paySuccess').classList.remove('hidden');
-      btn.textContent = '✓ Paid'; btn.classList.replace('bg-forest','bg-green-700');
-    }, 800);
+    
+    const method = document.getElementById('selectedMethod').value;
+    const discount = document.getElementById('discountPct').value || 0;
+    
+    const fd = new URLSearchParams();
+    fd.append('orderId', currentOrderId);
+    fd.append('billId', currentBillId);
+    fd.append('method', method);
+    fd.append('discountPct', discount);
+    
+    fetch('${pageContext.request.contextPath}/admin/payment/process', {
+      method: 'POST',
+      body: fd,
+      headers: {'Content-Type': 'application/x-www-form-urlencoded'}
+    }).then(res => res.json())
+      .then(data => {
+         if (data.success) {
+           document.getElementById('paySuccess').classList.remove('hidden');
+           btn.textContent = '✓ Paid'; 
+           btn.classList.replace('bg-forest','bg-green-700');
+           setTimeout(() => location.reload(), 1500);
+         } else {
+           alert('Payment failed: ' + data.error);
+           btn.textContent = 'Process Payment'; btn.disabled=false;
+         }
+      }).catch(err => {
+         alert('Error processing payment.');
+         btn.textContent = 'Process Payment'; btn.disabled=false;
+      });
   }
 
   function applyInitialBillingQuery() {

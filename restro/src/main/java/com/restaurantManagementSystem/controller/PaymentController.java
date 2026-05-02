@@ -3,7 +3,9 @@ package com.restaurantManagementSystem.controller;
 import com.restaurantManagementSystem.dao.BillDAO;
 import com.restaurantManagementSystem.dao.OrderDAO;
 import com.restaurantManagementSystem.dao.PaymentDAO;
+import com.restaurantManagementSystem.dao.TableDAO;
 import com.restaurantManagementSystem.model.Bill;
+import com.restaurantManagementSystem.model.DiningTable;
 import com.restaurantManagementSystem.model.Order;
 import com.restaurantManagementSystem.model.Payment;
 import com.restaurantManagementSystem.model.User;
@@ -17,31 +19,32 @@ import java.math.BigDecimal;
  * PaymentController — process a payment for a bill.
  *
  * Routes (protected by AuthFilter — ADMIN or STAFF role):
- *   POST /admin/payment/process
+ * POST /admin/payment/process
  *
  * Accepts:
- *   billId         — int, required
- *   orderId        — int, required
- *   method         — CASH | ESEWA | KHALTI | CARD
- *   discountPct    — decimal, optional (0–100)
- *   transactionRef — String, optional (eSewa/Khalti reference)
+ * billId — int, required
+ * orderId — int, required
+ * method — CASH | ESEWA | KHALTI | CARD
+ * discountPct — decimal, optional (0–100)
+ * transactionRef — String, optional (eSewa/Khalti reference)
  *
  * Returns JSON:
- *   {"success": true,  "paymentId": 7}
- *   {"success": false, "error": "..."}
+ * {"success": true, "paymentId": 7}
+ * {"success": false, "error": "..."}
  *
  * Side effects:
- *   1. Applies discount to bill (if discountPct > 0)
- *   2. Inserts payment record
- *   3. Updates order status → SERVED
+ * 1. Applies discount to bill (if discountPct > 0)
+ * 2. Inserts payment record
+ * 3. Updates order status → SERVED
  *
  * MVC Role: Controller
  */
 public class PaymentController extends HttpServlet {
 
     private final PaymentDAO paymentDAO = new PaymentDAO();
-    private final BillDAO    billDAO    = new BillDAO();
-    private final OrderDAO   orderDAO   = new OrderDAO();
+    private final BillDAO billDAO = new BillDAO();
+    private final OrderDAO orderDAO = new OrderDAO();
+    private final TableDAO tableDAO = new TableDAO();
 
     @Override
     protected void doPost(HttpServletRequest req, HttpServletResponse resp)
@@ -52,18 +55,18 @@ public class PaymentController extends HttpServlet {
 
         try {
             // ── Parse parameters ──────────────────────────
-            String billIdStr   = req.getParameter("billId");
-            String orderIdStr  = req.getParameter("orderId");
-            String methodStr   = req.getParameter("method");
-            String discStr     = req.getParameter("discountPct");
-            String txnRef      = req.getParameter("transactionRef");
+            String billIdStr = req.getParameter("billId");
+            String orderIdStr = req.getParameter("orderId");
+            String methodStr = req.getParameter("method");
+            String discStr = req.getParameter("discountPct");
+            String txnRef = req.getParameter("transactionRef");
 
             if (billIdStr == null || orderIdStr == null || methodStr == null) {
                 write(resp, false, "Missing required parameters", -1);
                 return;
             }
 
-            int billId  = Integer.parseInt(billIdStr);
+            int billId = Integer.parseInt(billIdStr);
             int orderId = Integer.parseInt(orderIdStr);
             Payment.Method method = Payment.Method.valueOf(methodStr.toUpperCase());
 
@@ -94,13 +97,20 @@ public class PaymentController extends HttpServlet {
             HttpSession session = req.getSession(false);
             if (session != null) {
                 User user = (User) session.getAttribute("currentUser");
-                if (user != null) payment.setProcessedById(user.getId());
+                if (user != null)
+                    payment.setProcessedById(user.getId());
             }
 
             int paymentId = paymentDAO.create(payment);
 
             // ── Step 4: Mark order as SERVED ──────────────
             orderDAO.updateStatus(orderId, Order.Status.SERVED);
+
+            // ── Step 5: Free the table for the order once payment is complete ─
+            Order order = orderDAO.findById(orderId);
+            if (order != null) {
+                tableDAO.updateStatus(order.getTableId(), DiningTable.Status.FREE);
+            }
 
             // ── Return success ─────────────────────────────
             write(resp, true, null, paymentId);
@@ -124,4 +134,3 @@ public class PaymentController extends HttpServlet {
         }
     }
 }
-

@@ -80,27 +80,30 @@
       <h3 class="font-serif text-2xl font-normal">New Reservation</h3>
       <button onclick="document.getElementById('addResModal').classList.add('hidden')" class="text-muted hover:text-ink text-xl">✕</button>
     </div>
-    <div class="mb-4"><label class="block text-[10px] uppercase tracking-widest font-semibold text-muted mb-2">Guest Name</label>
-      <input type="text" placeholder="Full name" class="gk-field w-full px-3 py-2 bg-white border border-black/10 rounded text-sm text-ink placeholder-muted2 outline-none"></div>
-    <div class="grid grid-cols-2 gap-4 mb-4">
-      <div><label class="block text-[10px] uppercase tracking-widest font-semibold text-muted mb-2">Phone</label>
-        <input type="text" placeholder="98XXXXXXXX" class="gk-field w-full px-3 py-2 bg-white border border-black/10 rounded text-sm text-ink placeholder-muted2 outline-none"></div>
-      <div><label class="block text-[10px] uppercase tracking-widest font-semibold text-muted mb-2">Party Size</label>
-        <input type="number" placeholder="2" min="1" max="20" class="gk-field w-full px-3 py-2 bg-white border border-black/10 rounded text-sm text-ink placeholder-muted2 outline-none"></div>
-    </div>
-    <div class="grid grid-cols-2 gap-4 mb-4">
-      <div><label class="block text-[10px] uppercase tracking-widest font-semibold text-muted mb-2">Date</label>
-        <input type="date" class="gk-field w-full px-3 py-2 bg-white border border-black/10 rounded text-sm text-ink outline-none"></div>
-      <div><label class="block text-[10px] uppercase tracking-widest font-semibold text-muted mb-2">Time</label>
-        <input type="time" class="gk-field w-full px-3 py-2 bg-white border border-black/10 rounded text-sm text-ink outline-none"></div>
-    </div>
-    <div class="mb-6"><label class="block text-[10px] uppercase tracking-widest font-semibold text-muted mb-2">Notes</label>
-      <textarea rows="2" placeholder="Special requests…" class="gk-field w-full px-3 py-2 bg-white border border-black/10 rounded text-sm text-ink placeholder-muted2 outline-none resize-y"></textarea></div>
-    <div class="flex gap-3 justify-end">
-      <button onclick="document.getElementById('addResModal').classList.add('hidden')"
-              class="text-sm border border-black/16 px-5 py-2 rounded hover:border-forest hover:text-forest transition-all">Cancel</button>
-      <button class="text-sm bg-forest text-white px-5 py-2 rounded hover:bg-forest-md transition-colors">Save Reservation</button>
-    </div>
+    <form method="POST" action="${pageContext.request.contextPath}/admin/reservations">
+      <input type="hidden" name="action" value="create">
+      <div class="mb-4"><label class="block text-[10px] uppercase tracking-widest font-semibold text-muted mb-2">Guest Name</label>
+        <input type="text" name="guestName" required placeholder="Full name" class="gk-field w-full px-3 py-2 bg-white border border-black/10 rounded text-sm text-ink placeholder-muted2 outline-none"></div>
+      <div class="grid grid-cols-2 gap-4 mb-4">
+        <div><label class="block text-[10px] uppercase tracking-widest font-semibold text-muted mb-2">Phone</label>
+          <input type="text" name="guestPhone" placeholder="98XXXXXXXX" class="gk-field w-full px-3 py-2 bg-white border border-black/10 rounded text-sm text-ink placeholder-muted2 outline-none"></div>
+        <div><label class="block text-[10px] uppercase tracking-widest font-semibold text-muted mb-2">Party Size</label>
+          <input type="number" name="partySize" required placeholder="2" min="1" max="20" class="gk-field w-full px-3 py-2 bg-white border border-black/10 rounded text-sm text-ink placeholder-muted2 outline-none"></div>
+      </div>
+      <div class="grid grid-cols-2 gap-4 mb-4">
+        <div><label class="block text-[10px] uppercase tracking-widest font-semibold text-muted mb-2">Date</label>
+          <input type="date" name="date" required class="gk-field w-full px-3 py-2 bg-white border border-black/10 rounded text-sm text-ink outline-none"></div>
+        <div><label class="block text-[10px] uppercase tracking-widest font-semibold text-muted mb-2">Time</label>
+          <input type="time" name="time" required class="gk-field w-full px-3 py-2 bg-white border border-black/10 rounded text-sm text-ink outline-none"></div>
+      </div>
+      <div class="mb-6"><label class="block text-[10px] uppercase tracking-widest font-semibold text-muted mb-2">Notes</label>
+        <textarea name="notes" rows="2" placeholder="Special requests…" class="gk-field w-full px-3 py-2 bg-white border border-black/10 rounded text-sm text-ink placeholder-muted2 outline-none resize-y"></textarea></div>
+      <div class="flex gap-3 justify-end">
+        <button type="button" onclick="document.getElementById('addResModal').classList.add('hidden')"
+                class="text-sm border border-black/16 px-5 py-2 rounded hover:border-forest hover:text-forest transition-all">Cancel</button>
+        <button type="submit" class="text-sm bg-forest text-white px-5 py-2 rounded hover:bg-forest-md transition-colors">Save Reservation</button>
+      </div>
+    </form>
   </div>
 </div>
 </body></html>

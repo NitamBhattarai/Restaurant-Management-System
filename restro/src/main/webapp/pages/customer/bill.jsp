@@ -1,88 +1,106 @@
 <%@ page contentType="text/html;charset=UTF-8" import="com.restaurantManagementSystem.model.*" %>
 <%@ taglib prefix="c" uri="jakarta.tags.core" %>
 <%@ taglib prefix="fmt" uri="jakarta.tags.fmt" %>
-<c:set var="pageTitle" value="Your Bill"/>
+<c:set var="pageTitle" value="Review Your Order"/>
 <%@ include file="/pages/errorpages/header.jsp" %>
 
-<c:choose>
-  <c:when test="${not empty table.qrToken}">
-    <c:set var="backToMenuUrl" value="${pageContext.request.contextPath}/customer/menu?table=${table.qrToken}"/>
-  </c:when>
-  <c:otherwise>
-    <c:set var="backToMenuUrl" value="${pageContext.request.contextPath}/customer/scan"/>
-  </c:otherwise>
-</c:choose>
+<div class="min-h-screen bg-paper flex flex-col items-center py-10 px-4 sm:px-6 lg:px-8">
+  
+  <div class="w-full max-w-5xl bg-white shadow-xl shadow-black/5 flex flex-col md:flex-row overflow-hidden" style="min-height: 80vh;">
+    <!-- LEFT COLUMN: Review Your Order -->
+    <div class="w-full md:w-[45%] bg-[#f4f5f5] p-10 md:p-14 flex flex-col">
+      <div class="mb-10">
+        <h1 class="font-serif text-2xl text-[#214a3f] mb-2">Review Your Order</h1>
+        <p class="text-[13px] text-muted italic">Savoring the spirit of the Himalayas at Gokyo Bistro.</p>
+      </div>
 
-<nav class="sticky top-0 z-50 h-16 flex items-center justify-between px-5 bg-white/96 backdrop-blur-md border-b border-black/10">
-  <a href="${pageContext.request.contextPath}/" class="font-serif text-xl font-bold text-ink">Gokyo Bistro</a>
-  <a href="${backToMenuUrl}" class="text-sm text-muted hover:text-forest transition-colors">Back to Menu</a>
-</nav>
+      <div class="flex-1 overflow-y-auto pr-2 space-y-6">
+        <c:choose>
+          <c:when test="${not empty order and not empty order.items}">
+            <c:forEach items="${order.items}" var="item">
+              <div class="flex items-center gap-4">
+                <div class="w-14 h-14 bg-white rounded-lg flex items-center justify-center text-2xl shadow-sm border border-black/5">
+                  <c:out value="${item.menuItemEmoji}"/>
+                </div>
+                <div class="flex-1">
+                  <div class="flex justify-between items-start">
+                    <div class="font-medium text-[#2f3e3a] text-[15px]"><c:out value="${item.menuItemName}"/></div>
+                    <div class="font-medium text-[#2f3e3a] text-[14px]">
+                      <span class="text-[11px]">रू</span> <fmt:formatNumber value="${item.lineTotal}" pattern="#,##0"/>
+                    </div>
+                  </div>
+                  <div class="text-[12px] text-muted mt-0.5"><c:out value="${item.quantity}"/> × Fresh local prep</div>
+                </div>
+              </div>
+            </c:forEach>
+          </c:when>
+          <c:otherwise>
+            <div class="text-sm text-muted">No items in your order yet.</div>
+          </c:otherwise>
+        </c:choose>
+      </div>
 
-<div class="max-w-lg mx-auto px-4 py-8">
-  <div class="bg-white border border-black/10 rounded-2xl overflow-hidden shadow">
-    <div class="px-6 py-8 text-center bg-paper2 border-b border-black/10">
-      <h1 class="font-serif text-4xl font-normal mb-1">Your Bill</h1>
-      <p class="text-sm font-light text-muted">
-        ${table.tableNumber}
-        <c:if test="${not empty order}">
-          · <c:out value="${order.orderCode}"/>
-        </c:if>
-      </p>
+      <c:if test="${not empty bill}">
+        <div class="mt-10 border-t border-black/10 pt-6 space-y-3">
+          <div class="flex justify-between text-[13px] text-muted font-medium">
+            <span>Subtotal</span>
+            <span><span class="text-[10px]">रू</span> <fmt:formatNumber value="${bill.subtotal}" pattern="#,##0"/></span>
+          </div>
+          <div class="flex justify-between text-[13px] text-muted font-medium">
+            <span>Service Charge (${bill.serviceRate}%)</span>
+            <span><span class="text-[10px]">रू</span> <fmt:formatNumber value="${bill.serviceAmount}" pattern="#,##0"/></span>
+          </div>
+          <div class="flex justify-between text-[13px] text-muted font-medium">
+            <span>VAT (${bill.vatRate}%)</span>
+            <span><span class="text-[10px]">रू</span> <fmt:formatNumber value="${bill.vatAmount}" pattern="#,##0"/></span>
+          </div>
+          <div class="flex justify-between items-baseline pt-4 mt-2">
+            <span class="font-serif text-lg font-bold text-[#1a3a2e]">Total</span>
+            <span class="font-serif text-[22px] font-bold text-[#1a3a2e]">
+              <fmt:formatNumber value="${bill.total}" pattern="#,##0.0"/>
+            </span>
+          </div>
+        </div>
+      </c:if>
     </div>
 
-    <c:choose>
-      <c:when test="${not empty order and not empty order.items}">
-        <div class="px-6 py-4">
-          <c:forEach items="${order.items}" var="item">
-            <div class="flex items-center justify-between py-3 border-b border-black/6 text-sm">
-              <span class="flex items-center gap-2">
-                <span><c:out value="${item.menuItemEmoji}"/></span>
-                <span><c:out value="${item.menuItemName}"/> x<c:out value="${item.quantity}"/></span>
-              </span>
-              <span class="font-medium">Rs <fmt:formatNumber value="${item.lineTotal}" pattern="#,##0.00"/></span>
-            </div>
-          </c:forEach>
-        </div>
-      </c:when>
-      <c:otherwise>
-        <div class="px-6 py-10 text-center text-sm text-muted">
-          No active bill is available for this table yet.
-        </div>
-      </c:otherwise>
-    </c:choose>
-
-    <c:if test="${not empty bill}">
-      <div class="px-6 py-5 bg-paper2 border-t border-black/10 space-y-2">
-        <div class="flex justify-between text-sm text-muted font-light">
-          <span>Subtotal</span>
-          <span>Rs <fmt:formatNumber value="${bill.subtotal}" pattern="#,##0.00"/></span>
-        </div>
-        <div class="flex justify-between text-sm text-muted font-light">
-          <span>VAT (${bill.vatRate}%)</span>
-          <span>Rs <fmt:formatNumber value="${bill.vatAmount}" pattern="#,##0.00"/></span>
-        </div>
-        <div class="flex justify-between text-sm text-muted font-light">
-          <span>Service Charge (${bill.serviceRate}%)</span>
-          <span>Rs <fmt:formatNumber value="${bill.serviceAmount}" pattern="#,##0.00"/></span>
-        </div>
-        <c:if test="${bill.discountPct > 0}">
-          <div class="flex justify-between text-sm text-green-700 font-light">
-            <span>Discount (${bill.discountPct}%)</span>
-            <span>-Rs <fmt:formatNumber value="${bill.discountAmt}" pattern="#,##0.00"/></span>
-          </div>
-        </c:if>
-        <div class="flex justify-between font-semibold border-t border-black/16 pt-4 mt-2">
-          <span>Total Amount</span>
-          <span class="font-serif text-2xl text-forest">
-            Rs <fmt:formatNumber value="${bill.total}" pattern="#,##0.00"/>
-          </span>
-        </div>
-        <p class="text-xs text-muted font-light text-center pt-2">
-          Payment will be processed at the counter by your server.
-        </p>
+    <!-- RIGHT COLUMN: Payment Instructions -->
+    <div class="w-full md:w-[55%] bg-white p-10 md:p-14 flex flex-col items-center justify-center text-center relative">
+      <div class="w-20 h-20 bg-[#eef8f4] rounded-full flex items-center justify-center text-4xl mb-6 shadow-sm border border-[#114b3e]/10">🛎️</div>
+      <h2 class="font-serif text-[28px] text-[#214a3f] mb-3">Ready to settle up?</h2>
+      <p class="text-[14px] text-muted mb-8 max-w-md leading-relaxed">
+        Please proceed to the billing counter or ask your server to settle your bill. We accept Cash, eSewa, Khalti, and major Credit Cards.
+      </p>
+      
+      <div class="flex gap-4 mb-auto">
+        <div class="w-12 h-12 rounded bg-paper flex items-center justify-center text-xl border border-black/5" title="Cash">💵</div>
+        <div class="w-12 h-12 rounded bg-paper flex items-center justify-center text-xl border border-black/5" title="eSewa">📱</div>
+        <div class="w-12 h-12 rounded bg-paper flex items-center justify-center text-xl border border-black/5" title="Khalti">💜</div>
+        <div class="w-12 h-12 rounded bg-paper flex items-center justify-center text-xl border border-black/5" title="Cards">💳</div>
       </div>
-    </c:if>
+
+      <div class="mt-8 bg-[#f8f9f9] rounded-xl p-5 border border-black/5 w-full max-w-md flex items-center justify-between text-left">
+        <div class="flex items-center gap-4">
+          <div class="w-8 h-8 rounded-full bg-white flex items-center justify-center shadow-sm text-[#114b3e] text-sm">★</div>
+          <div>
+            <div class="text-[13px] font-bold text-ink">Earn 680 Bistro Points</div>
+            <div class="text-[11px] text-muted">Mention your phone number at the counter.</div>
+          </div>
+        </div>
+      </div>
+    </div>
   </div>
+
+  <div class="w-full max-w-5xl mt-8 flex flex-col md:flex-row justify-between items-center text-[11px] text-muted2 font-medium px-4">
+    <div class="font-serif italic text-[14px] text-muted">Gokyo Bistro</div>
+    <div class="flex gap-6 mt-4 md:mt-0">
+      <a href="#" class="hover:text-ink transition-colors">Privacy Policy</a>
+      <a href="#" class="hover:text-ink transition-colors">Terms of Service</a>
+      <a href="#" class="hover:text-ink transition-colors">Contact Us</a>
+    </div>
+    <div class="mt-4 md:mt-0">© 2026 Gokyo Bistro. All Rights Reserved.</div>
+  </div>
+
 </div>
 
 <%@ include file="/pages/errorpages/footer.jsp" %>

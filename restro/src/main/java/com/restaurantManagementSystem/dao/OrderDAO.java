@@ -129,10 +129,23 @@ public class OrderDAO {
         }
     }
 
-    /** Served orders awaiting payment — for billing page. */
-    public List<Order> findServed() throws SQLException {
-        String sql = BASE_SQL + " WHERE o.status = 'SERVED' ORDER BY o.ordered_at DESC";
+    /** Unpaid active orders — for billing page. */
+    public List<Order> findUnpaidOrders() throws SQLException {
+        String sql = BASE_SQL + " WHERE o.status != 'CANCELLED' "
+                   + "AND NOT EXISTS (SELECT 1 FROM bills b JOIN payments p ON b.id = p.bill_id WHERE b.order_id = o.id) "
+                   + "ORDER BY o.ordered_at DESC";
         return executeQuery(sql);
+    }
+
+    /** Single non-item order lookup — useful for status/payment flows. */
+    public Order findById(int orderId) throws SQLException {
+        String sql = BASE_SQL + " WHERE o.id=?";
+        try (Connection conn = DBConnection.getConnection();
+                PreparedStatement ps = conn.prepareStatement(sql)) {
+            ps.setInt(1, orderId);
+            List<Order> results = mapResultSet(ps.executeQuery());
+            return results.isEmpty() ? null : results.get(0);
+        }
     }
 
     /** Single order with all items loaded. */

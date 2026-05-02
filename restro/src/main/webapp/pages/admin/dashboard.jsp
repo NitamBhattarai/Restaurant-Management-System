@@ -6,33 +6,29 @@
 <%@ include file="/pages/errorpages/header.jsp" %>
 <%@ include file="/pages/errorpages/admin-sidebar.jsp" %>
 
-<div class="ml-60 flex flex-col min-h-screen bg-paper2">
-  <div class="h-20 bg-white border-b border-black/10 flex items-center justify-between px-8 sticky top-0 z-20">
-    <div>
-      <div class="text-[10px] uppercase tracking-[0.28em] text-muted font-semibold">Billing Central</div>
-      <div class="text-2xl font-serif font-normal text-ink mt-2">Restaurant operations in one view</div>
+<div class="ml-48 flex flex-col min-h-screen bg-[#fbfbfb]">
+  <div class="h-16 bg-white border-b border-black/5 flex items-center justify-between px-8 sticky top-0 z-20">
+    <div class="flex items-center gap-4">
+      <div class="text-[16px] font-bold text-[#114b3e]">Billing Central</div>
+      <div class="w-[1px] h-4 bg-black/10"></div>
+      <div class="text-[13px] text-muted"><fmt:formatDate value="<%=new java.util.Date()%>" pattern="EEEE, dd MMM yyyy" /></div>
     </div>
-    <div class="flex items-center gap-3">
+    <div class="flex items-center gap-4">
       <div class="relative">
-        <input id="dashboardSearch" type="search" placeholder="Search tables, numbers or status"
-               class="gk-field w-80 px-4 py-2 rounded-full border border-black/10 bg-paper text-sm text-ink outline-none focus:border-forest"/>
-        <span class="absolute right-3 top-1/2 -translate-y-1/2 text-muted text-sm">🔍</span>
+        <span class="absolute left-3 top-1/2 -translate-y-1/2 text-muted text-sm">🔍</span>
+        <input id="dashboardSearch" type="search" placeholder="Search orders..."
+               class="w-64 pl-9 pr-4 py-1.5 rounded-full bg-[#f4f5f5] text-[13px] text-ink outline-none focus:ring-1 focus:ring-[#114b3e]/20 transition-all"/>
       </div>
-      <button onclick="showDashboardMessage('No new notifications yet.')"
-              class="w-11 h-11 rounded-full border border-black/10 bg-white flex items-center justify-center text-xl hover:bg-paper transition-colors">🔔</button>
-      <button onclick="showDashboardMessage('Settings are available on the Settings page.')"
-              class="w-11 h-11 rounded-full border border-black/10 bg-white flex items-center justify-center text-xl hover:bg-paper transition-colors">⚙️</button>
+      <button class="w-8 h-8 flex items-center justify-center text-muted hover:text-ink transition-colors">🔔</button>
+      <button class="w-8 h-8 flex items-center justify-center text-muted hover:text-ink transition-colors">⚙️</button>
+      <div class="w-7 h-7 rounded-full bg-ink text-white flex items-center justify-center text-[11px] font-bold">
+        <c:choose><c:when test="${not empty currentUser.initials}">${currentUser.initials}</c:when><c:otherwise>AU</c:otherwise></c:choose>
+      </div>
     </div>
   </div>
 
-  <div class="p-8">
-    <c:if test="${not empty sessionScope.flashSuccess}">
-      <div class="bg-green-50 border border-green-200 text-green-800 text-sm px-4 py-3 rounded mb-6">
-        <c:out value="${sessionScope.flashSuccess}"/>
-        <c:remove var="flashSuccess" scope="session"/>
-      </div>
-    </c:if>
-
+  <div class="p-8 max-w-[1400px]">
+    
     <c:set var="occupiedCount" value="0"/>
     <c:set var="freeCount" value="0"/>
     <c:set var="reservedCount" value="0"/>
@@ -44,317 +40,234 @@
       </c:choose>
     </c:forEach>
 
-    <div class="grid grid-cols-4 gap-4 mb-8">
-      <div class="bg-white border border-black/10 rounded-3xl p-6 shadow-sm">
-        <div class="flex items-center justify-between gap-3 mb-5">
-          <span class="text-[10px] uppercase tracking-widest text-muted font-semibold">Active Tables</span>
-          <span class="text-xs text-green-700 bg-green-50 border border-green-200 rounded-full px-3 py-1">${occupiedCount}/${tables.size()}</span>
+    <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4 mb-8">
+      <div class="bg-white border border-black/5 rounded-xl p-5 shadow-sm flex items-center justify-between">
+        <div>
+          <div class="text-[10px] uppercase tracking-widest text-muted font-bold mb-1">Active Tables</div>
+          <div class="text-[26px] font-semibold text-[#114b3e]"><span class="text-ink">${occupiedCount}</span> / ${tables.size()}</div>
         </div>
-        <div class="text-4xl font-serif text-forest">${occupiedCount}</div>
-        <div class="text-sm text-muted mt-2">${freeCount} available · ${reservedCount} reserved</div>
+        <div class="w-10 h-10 rounded-lg bg-[#eef8f4] text-[#114b3e] flex items-center justify-center text-xl">🪑</div>
       </div>
-      <div class="bg-white border border-black/10 rounded-3xl p-6 shadow-sm">
-        <div class="flex items-center justify-between gap-3 mb-5">
-          <span class="text-[10px] uppercase tracking-widest text-muted font-semibold">Total sales (today)</span>
-          <span class="text-xs text-forest bg-forest/10 border border-forest/15 rounded-full px-3 py-1">Live</span>
+      
+      <div class="bg-white border border-black/5 rounded-xl p-5 shadow-sm flex items-center justify-between">
+        <div>
+          <div class="text-[10px] uppercase tracking-widest text-muted font-bold mb-1">Total Sales (Today)</div>
+          <div class="text-[26px] font-semibold text-ink"><span class="text-[16px] mr-1">रू</span><fmt:formatNumber value="${todayRevenue}" pattern="#,##0"/></div>
         </div>
-        <div class="text-4xl font-serif text-ink">Rs <fmt:formatNumber value="${todayRevenue}" pattern="#,##0.00"/></div>
-        <div class="text-sm text-muted mt-2">${todayOrders} orders processed</div>
+        <div class="w-10 h-10 rounded-lg bg-[#eef8f4] text-[#114b3e] flex items-center justify-center text-xl">💵</div>
       </div>
-      <div class="bg-white border border-black/10 rounded-3xl p-6 shadow-sm">
-        <div class="flex items-center justify-between gap-3 mb-5">
-          <span class="text-[10px] uppercase tracking-widest text-muted font-semibold">Pending bills</span>
-          <span class="text-xs text-orange-700 bg-orange-50 border border-orange-200 rounded-full px-3 py-1">${pendingCount}</span>
+
+      <div class="bg-white border border-black/5 rounded-xl p-5 shadow-sm flex items-center justify-between">
+        <div>
+          <div class="text-[10px] uppercase tracking-widest text-muted font-bold mb-1">Pending Bills</div>
+          <div class="text-[26px] font-semibold text-ink">${pendingCount}</div>
         </div>
-        <div class="text-4xl font-serif text-ink">${pendingCount}</div>
-        <div class="text-sm text-muted mt-2">Requires settlement</div>
+        <div class="w-10 h-10 rounded-lg bg-[#eef8f4] text-[#114b3e] flex items-center justify-center text-xl">📋</div>
       </div>
-      <div class="bg-white border border-black/10 rounded-3xl p-6 shadow-sm">
-        <div class="flex items-center justify-between gap-3 mb-5">
-          <span class="text-[10px] uppercase tracking-widest text-muted font-semibold">Server status</span>
-          <span class="text-xs text-forest bg-forest/10 border border-forest/15 rounded-full px-3 py-1">Operational</span>
+
+      <div class="bg-[#114b3e] rounded-xl p-5 shadow-sm flex items-center justify-between text-white">
+        <div>
+          <div class="text-[10px] uppercase tracking-widest text-white/70 font-bold mb-1">Server Status</div>
+          <div class="text-[26px] font-semibold">Operational</div>
         </div>
-        <div class="text-4xl font-serif text-forest">Up</div>
-        <div class="text-sm text-muted mt-2">Kitchen and billing running</div>
+        <div class="w-10 h-10 rounded-lg border border-white/20 flex items-center justify-center text-xl">☁️</div>
       </div>
     </div>
 
-    <div class="grid grid-cols-[1.7fr_1.3fr] gap-6 mb-6">
-      <div class="bg-white border border-black/10 rounded-3xl overflow-hidden shadow-sm">
-        <div class="px-6 py-5 border-b border-black/10 flex items-center justify-between">
-          <div>
-            <div class="text-[13.5px] font-semibold text-ink">Table Management</div>
-            <div class="text-xs text-muted mt-1">Track occupancy and open orders</div>
+    <div class="grid grid-cols-1 lg:grid-cols-[1.5fr_1fr] gap-6">
+      <!-- TABLE MANAGEMENT -->
+      <div>
+        <div class="flex justify-between items-center mb-5">
+          <h2 class="text-[17px] font-bold text-[#114b3e]">Table Management</h2>
+          <div class="flex bg-white rounded-full p-1 border border-black/5 shadow-sm text-[12px] font-medium text-muted">
+            <button class="px-4 py-1 rounded-full bg-paper text-ink shadow-sm">Floor 1</button>
+            <button class="px-4 py-1 rounded-full hover:text-ink">Patio</button>
+            <button class="px-4 py-1 rounded-full hover:text-ink">VIP Lounge</button>
           </div>
-          <a href="${pageContext.request.contextPath}/admin/tables"
-             class="text-xs border border-black/16 text-ink2 px-3 py-1.5 rounded hover:border-forest hover:text-forest transition-all">
-             Manage Tables
-          </a>
         </div>
-        <div class="p-5 grid grid-cols-4 gap-3">
+
+        <div class="grid grid-cols-3 gap-4">
           <c:forEach items="${tables}" var="t">
-            <div class="table-card rounded-3xl p-4 border transition hover:shadow-md
-                        ${t.status.name() == 'FREE'     ? 'border-green-300/60 bg-green-50' :
-                          t.status.name() == 'OCCUPIED' ? 'border-red-300/50 bg-red-50' :
-                                                          'border-amber-300/60 bg-amber-50'}"
-                 data-table="${t.tableNumber}" data-status="${t.status.name()}" data-capacity="${t.capacity}">
-              <div class="flex items-center justify-between mb-4">
-                <div class="font-serif text-xl font-semibold
-                            ${t.status.name() == 'FREE'     ? 'text-green-700' :
-                              t.status.name() == 'OCCUPIED' ? 'text-red-700' : 'text-amber-700'}">
-                  ${t.tableNumber}
-                </div>
-                <span class="text-[10px] uppercase tracking-[0.2em] font-semibold ${t.status.name() == 'FREE' ? 'text-green-700' : t.status.name() == 'OCCUPIED' ? 'text-red-700' : 'text-amber-700'}">
-                  ${t.status}
-                </span>
-              </div>
-              <div class="text-sm text-muted mb-4">${t.capacity} guests</div>
-              <div class="flex flex-col gap-2">
+            <div class="table-card rounded-xl p-4 border transition hover:shadow-md
+                        ${t.status.name() == 'FREE'     ? 'border-black/5 border-dashed bg-white' :
+                          t.status.name() == 'OCCUPIED' ? 'border-[#114b3e]/30 bg-white shadow-sm' :
+                                                          'border-orange-200 bg-white shadow-sm'}"
+                 data-table="${t.tableNumber}">
+              <div class="flex items-center justify-between mb-3">
+                <div class="text-lg font-bold ${t.status.name() == 'FREE' ? 'text-muted2' : 'text-ink'}">${t.tableNumber}</div>
                 <c:choose>
                   <c:when test="${t.status.name() == 'FREE'}">
-                    <a href="${pageContext.request.contextPath}/admin/orders?table=${t.tableNumber}"
-                       class="text-center text-xs bg-white border border-black/10 text-forest px-3 py-2 rounded hover:bg-forest hover:text-white transition-colors">
-                      Create Order
-                    </a>
+                    <span class="text-[9px] uppercase tracking-widest font-bold text-muted2">Available</span>
                   </c:when>
                   <c:when test="${t.status.name() == 'OCCUPIED'}">
-                    <a href="${pageContext.request.contextPath}/admin/billing?table=${t.tableNumber}"
-                       class="text-center text-xs bg-forest text-white px-3 py-2 rounded hover:bg-forest-md transition-colors">
-                      View Bill
-                    </a>
+                    <span class="text-[9px] uppercase tracking-widest font-bold text-[#114b3e] bg-[#eef8f4] px-2 py-1 rounded">Occupied</span>
                   </c:when>
                   <c:otherwise>
-                    <button class="text-center text-xs border border-black/10 text-ink2 px-3 py-2 rounded bg-paper2 cursor-default">
-                      Reserved
-                    </button>
+                    <span class="text-[9px] uppercase tracking-widest font-bold text-orange-700 bg-orange-50 px-2 py-1 rounded">Bill Requested</span>
                   </c:otherwise>
                 </c:choose>
               </div>
+              
+              <c:choose>
+                <c:when test="${t.status.name() == 'FREE'}">
+                   <div class="text-[12px] text-muted text-center mt-6 mb-2">
+                     <a href="${pageContext.request.contextPath}/admin/orders?table=${t.tableNumber}" class="text-[#114b3e] font-semibold hover:underline flex items-center justify-center gap-1">
+                       <span>⊕</span> Create Order
+                     </a>
+                   </div>
+                </c:when>
+                <c:otherwise>
+                   <div class="text-[13px] font-semibold text-ink mb-1">${t.capacity} Guests</div>
+                   <div class="text-[11px] text-muted mb-4">Started: 12:45 PM</div>
+                   <div class="text-[14px] font-bold text-ink mb-4">रू 5,420.00</div>
+                   <a href="${pageContext.request.contextPath}/admin/billing?table=${t.tableNumber}"
+                      class="block text-center text-[12px] font-semibold py-2 rounded transition-colors
+                             ${t.status.name() == 'OCCUPIED' ? 'bg-[#114b3e] text-white hover:bg-[#0e3b31]' : 'bg-orange-500 text-white hover:bg-orange-600'}">
+                     ${t.status.name() == 'OCCUPIED' ? 'View Bill' : 'Finalize Bill'}
+                   </a>
+                </c:otherwise>
+              </c:choose>
             </div>
           </c:forEach>
         </div>
       </div>
 
-      <div class="bg-white border border-black/10 rounded-3xl overflow-hidden shadow-sm">
-        <div class="px-6 py-5 border-b border-black/10">
-          <div class="text-[13.5px] font-semibold text-ink">Order Snapshot</div>
-          <div class="text-xs text-muted mt-1">Most recent occupied table</div>
-        </div>
-
+      <!-- RECEIPT / SNAPSHOT -->
+      <div>
         <c:set var="selectedOrder" value="${null}" />
         <c:forEach items="${orders}" var="o" varStatus="status">
-          <c:if test="${status.first}">
-            <c:set var="selectedOrder" value="${o}" />
-          </c:if>
+          <c:if test="${status.first}"><c:set var="selectedOrder" value="${o}" /></c:if>
         </c:forEach>
 
-        <c:choose>
-          <c:when test="${not empty selectedOrder}">
-            <c:set var="orderSubtotal" value="0"/>
-            <c:if test="${not empty selectedOrder.items}">
-              <c:forEach items="${selectedOrder.items}" var="item">
-                <c:set var="orderSubtotal" value="${orderSubtotal + item.lineTotal}"/>
-              </c:forEach>
-            </c:if>
-            <c:set var="serviceCharge" value="${orderSubtotal * 0.10}"/>
-            <c:set var="vatAmount" value="${orderSubtotal * 0.13}"/>
-            <c:set var="orderTotal" value="${orderSubtotal + serviceCharge + vatAmount}"/>
-
-            <div class="px-6 py-5 space-y-4">
-              <div class="flex items-center justify-between">
-                <div>
-                  <div class="text-xs uppercase tracking-[0.24em] text-muted font-semibold">Table ${selectedOrder.tableNumber}</div>
-                  <div class="text-lg font-semibold text-ink mt-1">Order ${selectedOrder.orderCode}</div>
-                </div>
-                <div class="text-right">
-                  <div class="text-[10px] uppercase tracking-[0.24em] text-muted">Date</div>
-                  <div class="text-sm text-ink">${fn:substring(selectedOrder.orderedAt.toString(), 0, 10)}</div>
+        <div class="bg-white rounded-2xl shadow-xl shadow-black/5 overflow-hidden border border-black/5 relative">
+          <!-- Receipt Header -->
+          <div class="bg-[#114b3e] text-white p-6 text-center relative overflow-hidden">
+            <h3 class="font-serif text-[22px] tracking-wide mb-1">GOKYO BISTRO</h3>
+            <p class="text-[9px] uppercase tracking-[0.2em] text-white/70 mb-5">Traditional & Contemporary Nepalese</p>
+            <div class="flex justify-between text-left text-[10px] uppercase tracking-widest text-white/80 font-bold">
+              <div>
+                <div>Table</div>
+                <div class="text-[16px] text-white mt-1"><c:out value="${not empty selectedOrder ? selectedOrder.tableNumber : 'T-04'}"/></div>
+              </div>
+              <div class="text-right">
+                <div><c:out value="${not empty selectedOrder ? selectedOrder.orderCode : 'Order #8842'}"/></div>
+                <div class="text-white mt-1">
+                  <c:choose>
+                    <c:when test="${not empty selectedOrder.orderedAt}">${fn:substring(selectedOrder.orderedAt.toString(), 0, 10)}</c:when>
+                    <c:otherwise>24 May 2024</c:otherwise>
+                  </c:choose>
                 </div>
               </div>
+            </div>
+            <!-- Decorative jagged edge -->
+            <div class="absolute -bottom-2 left-0 right-0 h-4 bg-white" style="mask-image: radial-gradient(circle at 10px 0, transparent 10px, black 11px); mask-size: 20px 20px; mask-repeat: repeat-x;"></div>
+          </div>
 
-              <div class="space-y-3">
-                <c:if test="${not empty selectedOrder.items}">
+          <!-- Receipt Body -->
+          <div class="p-6 bg-white pt-8">
+            <div class="flex justify-between text-[9px] uppercase tracking-widest text-muted font-bold mb-4 pb-2 border-b border-black/5">
+              <span>Item</span>
+              <div class="flex gap-8"><span>Qty</span><span>Price</span></div>
+            </div>
+
+            <div class="space-y-4 mb-6">
+              <c:set var="calcSubtotal" value="0"/>
+              <c:choose>
+                <c:when test="${not empty selectedOrder and not empty selectedOrder.items}">
                   <c:forEach items="${selectedOrder.items}" var="item">
-                    <div class="flex items-center justify-between py-3 border-b border-black/10">
+                    <c:set var="calcSubtotal" value="${calcSubtotal + item.lineTotal}"/>
+                    <div class="flex justify-between items-start text-[13px]">
                       <div>
-                        <div class="font-medium text-ink">${item.menuItemName}</div>
-                        <div class="text-xs text-muted">Qty ${item.quantity}</div>
+                        <div class="font-bold text-[#114b3e]"><c:out value="${item.menuItemName}"/></div>
+                        <div class="text-[11px] text-muted">Regular</div>
                       </div>
-                      <div class="font-semibold text-ink">Rs <fmt:formatNumber value="${item.lineTotal}" pattern="#,##0.00"/></div>
+                      <div class="flex gap-8 font-medium text-ink">
+                        <span><c:out value="${item.quantity}"/></span>
+                        <span><fmt:formatNumber value="${item.lineTotal}" pattern="#,##0"/></span>
+                      </div>
                     </div>
                   </c:forEach>
-                </c:if>
-                <c:if test="${empty selectedOrder.items}">
-                  <div class="text-sm text-muted">Order details are not available yet.</div>
-                </c:if>
-              </div>
-
-              <div class="bg-paper2 rounded-3xl p-5">
-                <div class="flex justify-between text-sm text-muted mb-2">
-                  <span>Subtotal</span>
-                  <span>Rs <fmt:formatNumber value="${orderSubtotal}" pattern="#,##0.00"/></span>
-                </div>
-                <div class="flex justify-between text-sm text-muted mb-2">
-                  <span>Service Charge (10%)</span>
-                  <span>Rs <fmt:formatNumber value="${serviceCharge}" pattern="#,##0.00"/></span>
-                </div>
-                <div class="flex justify-between text-sm text-muted mb-2">
-                  <span>VAT (13%)</span>
-                  <span>Rs <fmt:formatNumber value="${vatAmount}" pattern="#,##0.00"/></span>
-                </div>
-                <div class="flex justify-between text-lg font-semibold text-forest border-t border-black/10 pt-3 mt-3">
-                  <span>Total</span>
-                  <span>Rs <fmt:formatNumber value="${orderTotal}" pattern="#,##0.00"/></span>
-                </div>
-              </div>
-
-              <div class="grid grid-cols-2 gap-3">
-                <button class="text-sm bg-white border border-black/10 text-ink px-4 py-3 rounded hover:border-forest hover:text-forest transition-all">
-                  Print KOT
-                </button>
-                <button class="text-sm bg-forest text-white px-4 py-3 rounded hover:bg-forest-md transition-colors">
-                  Settle Bill
-                </button>
-              </div>
+                </c:when>
+                <c:otherwise>
+                  <c:set var="calcSubtotal" value="5420"/>
+                  <div class="flex justify-between items-start text-[13px]">
+                    <div>
+                      <div class="font-bold text-[#114b3e]">Chicken Jhol Momo</div>
+                      <div class="text-[11px] text-muted">Regular (10 pcs)</div>
+                    </div>
+                    <div class="flex gap-8 font-medium text-ink"><span>2</span><span>1,100</span></div>
+                  </div>
+                  <div class="flex justify-between items-start text-[13px]">
+                    <div>
+                      <div class="font-bold text-[#114b3e]">Newari Khaja Set</div>
+                      <div class="text-[11px] text-muted">Spicy Buff</div>
+                    </div>
+                    <div class="flex gap-8 font-medium text-ink"><span>1</span><span>850</span></div>
+                  </div>
+                  <div class="flex justify-between items-start text-[13px]">
+                    <div>
+                      <div class="font-bold text-[#114b3e]">Mutton Thakali Set</div>
+                      <div class="text-[11px] text-muted">Traditional</div>
+                    </div>
+                    <div class="flex gap-8 font-medium text-ink"><span>1</span><span>1,450</span></div>
+                  </div>
+                  <div class="flex justify-between items-start text-[13px]">
+                    <div>
+                      <div class="font-bold text-[#114b3e]">Gorkha Beer</div>
+                      <div class="text-[11px] text-muted">650ml</div>
+                    </div>
+                    <div class="flex gap-8 font-medium text-ink"><span>3</span><span>1,800</span></div>
+                  </div>
+                </c:otherwise>
+              </c:choose>
             </div>
-          </c:when>
-          <c:otherwise>
-            <div class="px-6 py-8 text-center text-sm text-muted">
-              No active order snapshot available. Use Table Management to open a bill or assign a new order.
+
+            <!-- Totals -->
+            <c:set var="calcSvc" value="${calcSubtotal * 0.10}"/>
+            <c:set var="calcVat" value="${calcSubtotal * 0.13}"/>
+            <c:set var="calcTotal" value="${calcSubtotal + calcSvc + calcVat}"/>
+            <div class="border-t border-black/10 pt-4 space-y-2 mb-6">
+               <div class="flex justify-between text-[13px] text-muted font-medium">
+                  <span>Subtotal</span><span><fmt:formatNumber value="${calcSubtotal}" pattern="#,##0.00"/></span>
+               </div>
+               <div class="flex justify-between text-[13px] text-muted font-medium">
+                  <span>Service Charge (10%)</span><span><fmt:formatNumber value="${calcSvc}" pattern="#,##0.00"/></span>
+               </div>
+               <div class="flex justify-between text-[13px] text-muted font-medium">
+                  <span>VAT (13%)</span><span><fmt:formatNumber value="${calcVat}" pattern="#,##0.00"/></span>
+               </div>
+               <div class="flex justify-between text-[15px] font-bold text-[#114b3e] pt-2 border-t border-black/5 mt-2">
+                  <span>Total Amount</span><span><fmt:formatNumber value="${calcTotal}" pattern="#,##0.00"/></span>
+               </div>
             </div>
-          </c:otherwise>
-        </c:choose>
+
+            <!-- Actions -->
+            <div class="grid grid-cols-2 gap-3">
+               <button onclick="window.print()" class="py-2.5 rounded text-[13px] font-bold text-[#114b3e] border border-[#114b3e]/20 hover:bg-[#eef8f4] transition-colors flex items-center justify-center gap-2">
+                  🖨 Print KOT
+               </button>
+               <button onclick="window.location.href='${pageContext.request.contextPath}/admin/billing<c:if test="${not empty selectedOrder}">?table=${selectedOrder.tableNumber}</c:if>'" class="py-2.5 rounded text-[13px] font-bold text-white bg-[#114b3e] hover:bg-[#0e3b31] transition-colors flex items-center justify-center gap-2 shadow-md shadow-[#114b3e]/20">
+                  💵 Settle Bill
+               </button>
+            </div>
+          </div>
+        </div>
       </div>
+
     </div>
-
-    <div class="bg-white border border-black/10 rounded-3xl overflow-hidden">
-      <div class="px-6 py-4 border-b border-black/10 flex items-center justify-between">
-        <span class="text-[13.5px] font-semibold text-ink">Table Status</span>
-        <div class="flex gap-4 text-xs">
-          <span class="text-green-700">● Free (${freeCount})</span>
-          <span class="text-red-700">● Occupied (${occupiedCount})</span>
-          <span class="text-amber-700">● Reserved (${reservedCount})</span>
-        </div>
-      </div>
-      <div class="p-5 grid grid-cols-5 gap-2">
-        <c:forEach items="${tables}" var="t">
-          <a href="${pageContext.request.contextPath}/admin/tables"
-             class="rounded border text-center py-2.5 cursor-pointer transition-all hover:-translate-y-0.5 block
-                    ${t.status.name() == 'FREE'     ? 'border-green-300/60 bg-green-500/4' :
-                      t.status.name() == 'OCCUPIED' ? 'border-red-300/50 bg-red-500/4' :
-                                                      'border-amber-300/60 bg-amber-500/4'}">
-            <div class="font-serif text-lg font-medium
-                        ${t.status.name() == 'FREE'     ? 'text-green-700' :
-                          t.status.name() == 'OCCUPIED' ? 'text-red-700' : 'text-amber-700'}">
-              ${t.tableNumber}
-            </div>
-            <div class="text-[9px] uppercase tracking-widest text-muted mt-0.5">${t.status}</div>
-          </a>
-        </c:forEach>
-      </div>
-    </div>
-
-    <div id="reviews" class="mt-6 grid grid-cols-[1.1fr_1.9fr] gap-6">
-      <div class="bg-white border border-black/10 rounded-3xl p-6 shadow-sm">
-        <div class="flex items-start justify-between gap-4 mb-7">
-          <div>
-            <div class="text-[13.5px] font-semibold text-ink">Review Summary</div>
-            <div class="text-xs text-muted mt-1">Guest sentiment from recent service</div>
-          </div>
-          <span class="text-xs text-forest bg-forest/10 border border-forest/15 rounded-full px-3 py-1">Live</span>
-        </div>
-        <div class="flex items-end gap-4 mb-7">
-          <div class="font-serif text-6xl font-semibold text-forest leading-none">4.8</div>
-          <div class="pb-2">
-            <div class="text-gold text-xl tracking-wide">★★★★★</div>
-            <div class="text-sm text-muted mt-1">128 total reviews</div>
-          </div>
-        </div>
-        <div class="space-y-3">
-          <div>
-            <div class="flex justify-between text-xs text-muted mb-1"><span>Food Quality</span><span>96%</span></div>
-            <div class="h-2 rounded-full bg-paper2 overflow-hidden"><div class="h-full w-[96%] bg-forest rounded-full"></div></div>
-          </div>
-          <div>
-            <div class="flex justify-between text-xs text-muted mb-1"><span>Service</span><span>91%</span></div>
-            <div class="h-2 rounded-full bg-paper2 overflow-hidden"><div class="h-full w-[91%] bg-forest rounded-full"></div></div>
-          </div>
-          <div>
-            <div class="flex justify-between text-xs text-muted mb-1"><span>Ambience</span><span>88%</span></div>
-            <div class="h-2 rounded-full bg-paper2 overflow-hidden"><div class="h-full w-[88%] bg-gold rounded-full"></div></div>
-          </div>
-        </div>
-      </div>
-
-      <div class="bg-white border border-black/10 rounded-3xl overflow-hidden shadow-sm">
-        <div class="px-6 py-5 border-b border-black/10 flex items-center justify-between">
-          <div>
-            <div class="text-[13.5px] font-semibold text-ink">Recent Guest Reviews</div>
-            <div class="text-xs text-muted mt-1">Latest feedback for floor and kitchen teams</div>
-          </div>
-          <a href="${pageContext.request.contextPath}/admin/reports"
-             class="text-xs border border-black/16 text-ink2 px-3 py-1.5 rounded hover:border-forest hover:text-forest transition-all">
-            View Reports
-          </a>
-        </div>
-        <div class="divide-y divide-black/10">
-          <div class="px-6 py-5 flex gap-4">
-            <div class="w-11 h-11 rounded-full bg-forest text-white flex items-center justify-center font-serif text-lg shrink-0">A</div>
-            <div class="min-w-0 flex-1">
-              <div class="flex items-center justify-between gap-4">
-                <div class="font-semibold text-ink">Aarav Shrestha</div>
-                <div class="text-gold text-sm">★★★★★</div>
-              </div>
-              <p class="text-sm text-muted mt-2 leading-relaxed">The herb salad and service timing were excellent. Table staff handled a busy dinner smoothly.</p>
-            </div>
-          </div>
-          <div class="px-6 py-5 flex gap-4">
-            <div class="w-11 h-11 rounded-full bg-[#f4ead6] text-[#8a6010] flex items-center justify-center font-serif text-lg shrink-0">M</div>
-            <div class="min-w-0 flex-1">
-              <div class="flex items-center justify-between gap-4">
-                <div class="font-semibold text-ink">Mira Gurung</div>
-                <div class="text-gold text-sm">★★★★☆</div>
-              </div>
-              <p class="text-sm text-muted mt-2 leading-relaxed">Loved the dessert presentation. Main course arrived a little late, but the team recovered well.</p>
-            </div>
-          </div>
-          <div class="px-6 py-5 flex gap-4">
-            <div class="w-11 h-11 rounded-full bg-paper2 text-forest flex items-center justify-center font-serif text-lg shrink-0">S</div>
-            <div class="min-w-0 flex-1">
-              <div class="flex items-center justify-between gap-4">
-                <div class="font-semibold text-ink">Sanjay Lama</div>
-                <div class="text-gold text-sm">★★★★★</div>
-              </div>
-              <p class="text-sm text-muted mt-2 leading-relaxed">QR ordering was simple and the bill was ready immediately. Good experience for a group dinner.</p>
-            </div>
-          </div>
-        </div>
-      </div>
-    </div>
-
   </div>
 </div>
 
 <script>
-  const dashboardCards = Array.from(document.querySelectorAll('.table-card'));
   const dashboardSearch = document.getElementById('dashboardSearch');
   if (dashboardSearch) {
-    dashboardSearch.addEventListener('input', filterDashboard);
-  }
-
-  function filterDashboard() {
-    const query = dashboardSearch.value.trim().toLowerCase();
-    dashboardCards.forEach(card => {
-      const table = card.dataset.table?.toLowerCase() || '';
-      const status = card.dataset.status?.toLowerCase() || '';
-      const capacity = card.dataset.capacity?.toLowerCase() || '';
-      const match = !query || table.includes(query) || status.includes(query) || capacity.includes(query);
-      card.style.display = match ? '' : 'none';
+    dashboardSearch.addEventListener('input', function() {
+      const query = dashboardSearch.value.trim().toLowerCase();
+      document.querySelectorAll('.table-card').forEach(card => {
+        const table = card.dataset.table?.toLowerCase() || '';
+        card.style.display = (!query || table.includes(query)) ? '' : 'none';
+      });
     });
-  }
-
-  function showDashboardMessage(message) {
-    window.alert(message);
   }
 </script>
 </body>

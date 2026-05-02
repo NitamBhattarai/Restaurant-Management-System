@@ -37,7 +37,9 @@ import java.util.UUID;
 // *
 // * MVC Role: Controller
 // */
+@jakarta.servlet.annotation.MultipartConfig(maxFileSize = 5242880, maxRequestSize = 10485760)
 public class AdminController extends HttpServlet {
+
 
     // ── DAOs (Model layer) ────────────────────────────────
     private final OrderDAO orderDAO = new OrderDAO();
@@ -73,7 +75,11 @@ public class AdminController extends HttpServlet {
                     break;
 
                 case "/admin/orders":
-                    req.setAttribute("orders", orderDAO.findAll());
+                    List<Order> allOrders = orderDAO.findAll();
+                    for (Order o : allOrders) {
+                        o.setItems(orderDAO.findOrderItems(o.getId()));
+                    }
+                    req.setAttribute("orders", allOrders);
                     forward(req, resp, "/pages/admin/orders.jsp");
                     break;
 
@@ -89,7 +95,16 @@ public class AdminController extends HttpServlet {
                     break;
 
                 case "/admin/billing":
-                    req.setAttribute("orders", orderDAO.findServed());
+                    List<Order> unpaidOrders = orderDAO.findUnpaidOrders();
+                    java.util.Map<Integer, Integer> billMap = new java.util.HashMap<>();
+                    com.restaurantManagementSystem.dao.BillDAO bDao = new com.restaurantManagementSystem.dao.BillDAO();
+                    for (Order o : unpaidOrders) {
+                        o.setItems(orderDAO.findOrderItems(o.getId()));
+                        com.restaurantManagementSystem.model.Bill b = bDao.findByOrderId(o.getId());
+                        if (b != null) billMap.put(o.getId(), b.getId());
+                    }
+                    req.setAttribute("orders", unpaidOrders);
+                    req.setAttribute("billMap", billMap);
                     forward(req, resp, "/pages/admin/billing.jsp");
                     break;
 
@@ -136,8 +151,6 @@ public class AdminController extends HttpServlet {
         }
     }
 
-    // ── POST ──────────────────────────────────────────────
-
     @Override
     protected void doPost(HttpServletRequest req, HttpServletResponse resp)
             throws ServletException, IOException {
@@ -152,6 +165,9 @@ public class AdminController extends HttpServlet {
                     break;
                 case "/admin/orders":
                     handleOrderPost(req, resp, action);
+                    break;
+                case "/admin/tables":
+                    handleTablePost(req, resp, action);
                     break;
                 case "/admin/users":
                     handleUserPost(req, resp, action);
@@ -279,6 +295,19 @@ public class AdminController extends HttpServlet {
             orderDAO.updateStatus(orderId, status);
         }
         resp.sendRedirect(req.getContextPath() + "/admin/orders");
+    }
+
+    // ── Table management ──────────────────────────────────
+    
+    private void handleTablePost(HttpServletRequest req, HttpServletResponse resp, String action)
+            throws Exception {
+        if ("create".equals(action)) {
+            String num = req.getParameter("tableNumber");
+            int cap = Integer.parseInt(req.getParameter("capacity"));
+            tableDAO.create(num, cap);
+            setFlash(req, "success", "Table added successfully.");
+        }
+        resp.sendRedirect(req.getContextPath() + "/admin/tables");
     }
 
     // ── User management ───────────────────────────────────

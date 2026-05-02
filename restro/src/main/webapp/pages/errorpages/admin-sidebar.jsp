@@ -7,12 +7,12 @@
 <aside class="w-48 bg-white border-r border-black/10 fixed top-0 bottom-0 left-0 z-30 flex flex-col overflow-y-auto">
   <div class="px-4 py-5 border-b border-black/10">
     <a href="<%=cp%>/admin/dashboard" class="flex items-center gap-3">
-      <div class="w-9 h-9 rounded-lg bg-forest text-white flex items-center justify-center font-semibold text-sm">
-        <span>G</span>
+      <div class="w-9 h-9 rounded-md bg-ink flex items-center justify-center">
+        <div class="w-3.5 h-3.5 bg-gold rounded-sm"></div>
       </div>
       <div>
-        <div class="font-serif text-[18px] font-bold text-ink leading-none">Gokyo Bistro</div>
-        <div class="text-[10px] uppercase tracking-[0.18em] text-muted2 font-semibold mt-1">Admin Dashboard</div>
+        <div class="font-serif text-[19px] font-bold text-forest leading-none">Gokyo Bistro</div>
+        <div class="text-[9px] uppercase tracking-[0.18em] text-muted font-semibold mt-1.5">Admin Dashboard</div>
       </div>
     </a>
   </div>

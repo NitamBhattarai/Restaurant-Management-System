@@ -125,6 +125,15 @@
 </div>
 
 <script>
+  const orderItemsData = {};
+  <c:forEach items="${orders}" var="o">
+    orderItemsData[${o.id}] = [
+      <c:forEach items="${o.items}" var="i">
+        { name: '<c:out value="${i.menuItemName}"/>', qty: ${i.quantity}, price: ${i.lineTotal} },
+      </c:forEach>
+    ];
+  </c:forEach>
+
 function filterTable() {
   const search = document.getElementById('searchInput').value.toLowerCase();
   const status = document.getElementById('statusFilter').value;
@@ -137,8 +146,17 @@ function filterTable() {
 }
 function viewOrder(id) {
   document.getElementById('orderModal').classList.remove('hidden');
-  document.getElementById('orderDetailBody').innerHTML =
-    '<p class="text-center py-4">Order #' + id + ' details would load here via AJAX in production.</p>';
+  const items = orderItemsData[id] || [];
+  if (items.length === 0) {
+    document.getElementById('orderDetailBody').innerHTML = '<p class="text-center py-4 text-muted">No items found for this order.</p>';
+    return;
+  }
+  let html = '<table class="w-full text-left text-sm mb-4"><thead><tr><th class="border-b border-black/10 pb-2 text-muted uppercase text-[10px] tracking-widest font-semibold">Item</th><th class="border-b border-black/10 pb-2 text-right text-muted uppercase text-[10px] tracking-widest font-semibold">Qty</th><th class="border-b border-black/10 pb-2 text-right text-muted uppercase text-[10px] tracking-widest font-semibold">Total</th></tr></thead><tbody>';
+  items.forEach(i => {
+     html += `<tr><td class="py-2 text-ink font-medium">${i.name}</td><td class="py-2 text-right text-muted">${i.qty}</td><td class="py-2 text-right text-ink font-medium">Rs ${i.price}</td></tr>`;
+  });
+  html += '</tbody></table>';
+  document.getElementById('orderDetailBody').innerHTML = html;
 }
 function closeModal() {
   document.getElementById('orderModal').classList.add('hidden');

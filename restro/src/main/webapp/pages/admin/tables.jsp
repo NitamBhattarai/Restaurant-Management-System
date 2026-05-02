@@ -13,7 +13,7 @@
       <div class="bg-white border border-black/10 rounded-xl overflow-hidden">
         <div class="px-6 py-4 border-b border-black/10 flex items-center justify-between">
           <span class="text-[13.5px] font-semibold text-ink">Table Map</span>
-          <button class="inline-flex items-center gap-2 bg-forest text-white px-4 py-2 rounded text-xs font-medium hover:bg-forest-md transition-colors">+ Add Table</button>
+          <button onclick="document.getElementById('addTableModal').classList.remove('hidden')" class="inline-flex items-center gap-2 bg-forest text-white px-4 py-2 rounded text-xs font-medium hover:bg-forest-md transition-colors">+ Add Table</button>
         </div>
         <div class="p-5 grid grid-cols-5 gap-2">
           <c:forEach items="${tables}" var="t">
@@ -60,6 +60,30 @@
         </table>
       </div>
     </div>
+  </div>
+</div>
+
+<div id="addTableModal" class="hidden fixed inset-0 bg-ink/45 z-50 flex items-center justify-center p-4">
+  <div class="bg-white rounded-2xl p-8 max-w-sm w-full shadow-xl">
+    <div class="flex items-center justify-between mb-6">
+      <h3 class="font-serif text-2xl font-normal">Add Table</h3>
+      <button onclick="document.getElementById('addTableModal').classList.add('hidden')" class="text-muted hover:text-ink text-xl">✕</button>
+    </div>
+    <form method="POST" action="${pageContext.request.contextPath}/admin/tables">
+      <input type="hidden" name="action" value="create">
+      <div class="mb-4">
+        <label class="block text-[10px] uppercase tracking-widest font-semibold text-muted mb-2">Table Number (e.g. T-10)</label>
+        <input type="text" name="tableNumber" required class="gk-field w-full px-3 py-2 bg-white border border-black/10 rounded text-sm text-ink outline-none">
+      </div>
+      <div class="mb-6">
+        <label class="block text-[10px] uppercase tracking-widest font-semibold text-muted mb-2">Capacity</label>
+        <input type="number" name="capacity" required min="1" max="20" class="gk-field w-full px-3 py-2 bg-white border border-black/10 rounded text-sm text-ink outline-none">
+      </div>
+      <div class="flex gap-3 justify-end">
+        <button type="button" onclick="document.getElementById('addTableModal').classList.add('hidden')" class="text-sm border border-black/16 px-5 py-2 rounded">Cancel</button>
+        <button type="submit" class="text-sm bg-forest text-white px-5 py-2 rounded">Add Table</button>
+      </div>
+    </form>
   </div>
 </div>
 </body></html>
