@@ -111,9 +111,6 @@ CREATE TABLE IF NOT EXISTS payments (
 
 CREATE TABLE IF NOT EXISTS reservations (
     id           INT AUTO_INCREMENT PRIMARY KEY,
-    guest_name   VARCHAR(100) NOT NULL,
-    guest_phone  VARCHAR(20),
-    guest_email  VARCHAR(150),
     table_id     INT,
     party_size   INT          NOT NULL DEFAULT 2,
     reserved_at  DATETIME     NOT NULL,
@@ -185,9 +182,9 @@ INSERT INTO menu_items (category_id, name, description, price, emoji) VALUES
 (4,'Seasonal Tart','Chef''s daily creation — ask your server for today''s selection',220.00,'🧁');
 
 -- Sample reservations
-INSERT INTO reservations (guest_name, guest_phone, table_id, party_size, reserved_at, status) VALUES
-('Ramesh Sharma','9841234567',6,4, DATE_ADD(NOW(), INTERVAL 3 HOUR), 'CONFIRMED'),
-('Anita Poudel', '9851234567',12,2, DATE_ADD(NOW(), INTERVAL 4 HOUR), 'PENDING');
+INSERT INTO reservations (table_id, party_size, reserved_at, status) VALUES
+(6,4, DATE_ADD(NOW(), INTERVAL 3 HOUR), 'CONFIRMED'),
+(12,2, DATE_ADD(NOW(), INTERVAL 4 HOUR), 'PENDING');
 
 -- Sample Guest Feedback
 INSERT INTO guest_feedback (guest_name, guest_email, table_number, cuisine_rating, service_rating, ambience_rating, overall_rating, comments, flagged) VALUES

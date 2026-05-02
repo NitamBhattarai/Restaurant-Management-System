@@ -124,7 +124,6 @@ public class AuthServlet extends HttpServlet {
         }
     }
 
-    // ── Helper method ─────────────────────────────────────
 
     private void handleLogout(HttpServletRequest req, HttpServletResponse resp, String path, String context)
             throws IOException {

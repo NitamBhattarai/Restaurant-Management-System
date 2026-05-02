@@ -1,13 +1,17 @@
 package com.restaurantManagementSystem.controller;
 
 import com.restaurantManagementSystem.dao.BillDAO;
+import com.restaurantManagementSystem.dao.FeedbackDAO;
 import com.restaurantManagementSystem.dao.MenuItemDAO;
 import com.restaurantManagementSystem.dao.OrderDAO;
+import com.restaurantManagementSystem.dao.ReservationDAO;
 import com.restaurantManagementSystem.dao.TableDAO;
 import com.restaurantManagementSystem.model.Bill;
 import com.restaurantManagementSystem.model.DiningTable;
+import com.restaurantManagementSystem.model.Feedback;
 import com.restaurantManagementSystem.model.Order;
 import com.restaurantManagementSystem.model.OrderItem;
+import com.restaurantManagementSystem.model.Reservation;
 import com.restaurantManagementSystem.model.User;
 
 import jakarta.servlet.ServletException;
@@ -26,6 +30,7 @@ public class CustomerServlet extends HttpServlet {
     private final TableDAO tableDAO = new TableDAO();
     private final OrderDAO orderDAO = new OrderDAO();
     private final BillDAO billDAO = new BillDAO();
+    private final FeedbackDAO feedbackDAO = new FeedbackDAO();
 
     @Override
     protected void doGet(HttpServletRequest req, HttpServletResponse resp)
@@ -108,10 +113,23 @@ public class CustomerServlet extends HttpServlet {
                     break;
                 }
 
+                case "/customer/reservation": {
+                    req.setAttribute("tables", tableDAO.findAll());
+                    forward(req, resp, "/pages/customer/reservation.jsp");
+                    break;
+                }
+
+                case "/customer/feedback": {
+                    forward(req, resp, "/pages/customer/feedback.jsp");
+                    break;
+                }
+
                 default:
                     resp.sendRedirect(req.getContextPath() + "/customer/scan");
             }
-        } catch (NumberFormatException e) {
+        } catch (
+
+        NumberFormatException e) {
             req.setAttribute("error", "Invalid parameter.");
             forward(req, resp, "/pages/customer/scan.jsp");
         } catch (Exception e) {
@@ -122,6 +140,24 @@ public class CustomerServlet extends HttpServlet {
     @Override
     protected void doPost(HttpServletRequest req, HttpServletResponse resp)
             throws ServletException, IOException {
+
+        String path = req.getServletPath();
+        if ("/customer/reservation".equals(path)) {
+            try {
+                handleReservationPost(req, resp);
+            } catch (Exception e) {
+                throw new ServletException("CustomerController reservation error", e);
+            }
+            return;
+        }
+        if ("/customer/feedback".equals(path)) {
+            try {
+                handleFeedbackPost(req, resp);
+            } catch (Exception e) {
+                throw new ServletException("CustomerController feedback error", e);
+            }
+            return;
+        }
 
         resp.setContentType("application/json;charset=UTF-8");
         resp.setHeader("Cache-Control", "no-cache");
@@ -188,6 +224,118 @@ public class CustomerServlet extends HttpServlet {
             json(resp, false, "Invalid number in request: " + safeMsg(e), -1);
         } catch (Exception e) {
             json(resp, false, safeMsg(e), -1);
+        }
+    }
+
+    private void handleReservationPost(HttpServletRequest req, HttpServletResponse resp)
+            throws Exception {
+        String partySizeStr = req.getParameter("partySize");
+        String date = req.getParameter("date");
+        String time = req.getParameter("time");
+        String tableIdStr = req.getParameter("tableId");
+
+        if (partySizeStr == null || partySizeStr.isBlank()
+                || date == null || date.isBlank() || time == null || time.isBlank()) {
+            req.setAttribute("error", "Date, time and party size are required.");
+            req.setAttribute("tables", tableDAO.findAll());
+            forward(req, resp, "/pages/customer/reservation.jsp");
+            return;
+        }
+
+        int partySize;
+        try {
+            partySize = Integer.parseInt(partySizeStr);
+        } catch (NumberFormatException e) {
+            req.setAttribute("error", "Party size must be a valid number.");
+            req.setAttribute("tables", tableDAO.findAll());
+            forward(req, resp, "/pages/customer/reservation.jsp");
+            return;
+        }
+
+        Integer tableId = null;
+        DiningTable table = null;
+        if (tableIdStr != null && !tableIdStr.isBlank()) {
+            tableId = Integer.parseInt(tableIdStr);
+            table = tableDAO.findById(tableId);
+            if (table == null) {
+                req.setAttribute("error", "Selected table not found.");
+                req.setAttribute("tables", tableDAO.findAll());
+                forward(req, resp, "/pages/customer/reservation.jsp");
+                return;
+            }
+            if (table.getStatus() != DiningTable.Status.FREE) {
+                req.setAttribute("error", "Please choose a free table or leave the selection blank.");
+                req.setAttribute("tables", tableDAO.findAll());
+                forward(req, resp, "/pages/customer/reservation.jsp");
+                return;
+            }
+        }
+
+        Reservation reservation = new Reservation();
+        reservation.setPartySize(partySize);
+        reservation.setReservedAt(java.time.LocalDateTime.parse(date + "T" + time));
+        reservation.setNotes(req.getParameter("notes"));
+        if (tableId != null) {
+            reservation.setTableId(tableId);
+        }
+
+        int reservationId = new ReservationDAO().create(reservation);
+        if (table != null) {
+            tableDAO.updateStatus(tableId, DiningTable.Status.RESERVED);
+        }
+
+        req.setAttribute("success", "Reservation request received. Reference #" + reservationId + ".");
+        req.setAttribute("tables", tableDAO.findAll());
+        forward(req, resp, "/pages/customer/reservation.jsp");
+    }
+
+    private void handleFeedbackPost(HttpServletRequest req, HttpServletResponse resp)
+            throws Exception {
+        String guestName = req.getParameter("guestName");
+        String guestEmail = req.getParameter("guestEmail");
+        String tableNumber = req.getParameter("tableNumber");
+        String cuisineRating = req.getParameter("cuisineRating");
+        String serviceRating = req.getParameter("serviceRating");
+        String ambienceRating = req.getParameter("ambienceRating");
+        String overallRating = req.getParameter("overallRating");
+        String comments = req.getParameter("comments");
+
+        if (guestName == null || guestName.isBlank() || guestEmail == null || guestEmail.isBlank()
+                || cuisineRating == null || cuisineRating.isBlank()
+                || serviceRating == null || serviceRating.isBlank()
+                || ambienceRating == null || ambienceRating.isBlank()
+                || overallRating == null || overallRating.isBlank()
+                || comments == null || comments.isBlank()) {
+            req.setAttribute("error", "Name, email, ratings and comments are required.");
+            forward(req, resp, "/pages/customer/feedback.jsp");
+            return;
+        }
+
+        Feedback feedback = new Feedback();
+        feedback.setGuestName(guestName.trim());
+        feedback.setGuestEmail(guestEmail.trim());
+        feedback.setTableNumber(tableNumber != null ? tableNumber.trim() : null);
+        feedback.setCuisineRating(parseRating(cuisineRating));
+        feedback.setServiceRating(parseRating(serviceRating));
+        feedback.setAmbienceRating(parseRating(ambienceRating));
+        feedback.setOverallRating(parseRating(overallRating));
+        feedback.setComments(comments.trim());
+
+        feedbackDAO.create(feedback);
+
+        req.setAttribute("success", "Thank you! Your feedback has been recorded.");
+        forward(req, resp, "/pages/customer/feedback.jsp");
+    }
+
+    private int parseRating(String value) {
+        try {
+            int rating = Integer.parseInt(value);
+            if (rating < 1 || rating > 5) {
+                throw new NumberFormatException("Rating must be between 1 and 5.");
+            }
+            return rating;
+        } catch (NumberFormatException e) {
+            throw new IllegalArgumentException("Invalid rating value.", e);
         }
     }
 

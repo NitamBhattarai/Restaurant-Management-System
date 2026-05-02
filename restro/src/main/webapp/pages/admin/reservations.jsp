@@ -22,11 +22,10 @@
       </div>
       <table class="w-full text-[13px]">
         <thead><tr class="border-b border-black/10">
-          <th class="px-4 py-2.5 text-left text-[10px] uppercase tracking-widest font-semibold text-muted">Guest Name</th>
           <th class="px-4 py-2.5 text-left text-[10px] uppercase tracking-widest font-semibold text-muted">Date &amp; Time</th>
           <th class="px-4 py-2.5 text-left text-[10px] uppercase tracking-widest font-semibold text-muted">Guests</th>
           <th class="px-4 py-2.5 text-left text-[10px] uppercase tracking-widest font-semibold text-muted">Table</th>
-          <th class="px-4 py-2.5 text-left text-[10px] uppercase tracking-widest font-semibold text-muted">Contact</th>
+          <th class="px-4 py-2.5 text-left text-[10px] uppercase tracking-widest font-semibold text-muted">Notes</th>
           <th class="px-4 py-2.5 text-left text-[10px] uppercase tracking-widest font-semibold text-muted">Status</th>
           <th class="px-4 py-2.5 text-left text-[10px] uppercase tracking-widest font-semibold text-muted">Actions</th>
         </tr></thead>
@@ -35,13 +34,12 @@
             <c:when test="${not empty reservations}">
               <c:forEach items="${reservations}" var="res">
                 <tr class="border-b border-black/5 hover:bg-paper transition-colors">
-                  <td class="px-4 py-3 font-medium text-ink"><c:out value="${res.guestName}"/></td>
                   <td class="px-4 py-3 text-sm">
                     ${not empty res.reservedAt ? fn:substring(res.reservedAt.toString(),0,16) : "—"}
                   </td>
                   <td class="px-4 py-3">${res.partySize}</td>
                   <td class="px-4 py-3 font-semibold">${not empty res.tableNumber ? res.tableNumber : '—'}</td>
-                  <td class="px-4 py-3 text-xs text-muted"><c:out value="${res.guestPhone}"/></td>
+                  <td class="px-4 py-3 text-xs text-muted"><c:out value="${res.notes != null ? res.notes : '—'}"/></td>
                   <td class="px-4 py-3">
                     <span class="badge ${res.status.name() == 'CONFIRMED' ? 'badge-paid' :
                                          res.status.name() == 'PENDING'   ? 'badge-pending' :
@@ -82,13 +80,17 @@
     </div>
     <form method="POST" action="${pageContext.request.contextPath}/admin/reservations">
       <input type="hidden" name="action" value="create">
-      <div class="mb-4"><label class="block text-[10px] uppercase tracking-widest font-semibold text-muted mb-2">Guest Name</label>
-        <input type="text" name="guestName" required placeholder="Full name" class="gk-field w-full px-3 py-2 bg-white border border-black/10 rounded text-sm text-ink placeholder-muted2 outline-none"></div>
       <div class="grid grid-cols-2 gap-4 mb-4">
-        <div><label class="block text-[10px] uppercase tracking-widest font-semibold text-muted mb-2">Phone</label>
-          <input type="text" name="guestPhone" placeholder="98XXXXXXXX" class="gk-field w-full px-3 py-2 bg-white border border-black/10 rounded text-sm text-ink placeholder-muted2 outline-none"></div>
         <div><label class="block text-[10px] uppercase tracking-widest font-semibold text-muted mb-2">Party Size</label>
           <input type="number" name="partySize" required placeholder="2" min="1" max="20" class="gk-field w-full px-3 py-2 bg-white border border-black/10 rounded text-sm text-ink placeholder-muted2 outline-none"></div>
+        <div><label class="block text-[10px] uppercase tracking-widest font-semibold text-muted mb-2">Table</label>
+          <select name="tableId" class="gk-field w-full px-3 py-2 bg-white border border-black/10 rounded text-sm text-ink outline-none">
+            <option value="">Any available table</option>
+            <c:forEach items="${tables}" var="t">
+              <option value="${t.id}">${t.tableNumber} — ${t.capacity} seats (${t.status})</option>
+            </c:forEach>
+          </select>
+        </div>
       </div>
       <div class="grid grid-cols-2 gap-4 mb-4">
         <div><label class="block text-[10px] uppercase tracking-widest font-semibold text-muted mb-2">Date</label>

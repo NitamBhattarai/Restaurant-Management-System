@@ -40,7 +40,6 @@ import java.util.UUID;
 @jakarta.servlet.annotation.MultipartConfig(maxFileSize = 5242880, maxRequestSize = 10485760)
 public class AdminServlet extends HttpServlet {
 
-
     // ── DAOs (Model layer) ────────────────────────────────
     private final OrderDAO orderDAO = new OrderDAO();
     private final MenuItemDAO menuDAO = new MenuItemDAO();
@@ -101,7 +100,8 @@ public class AdminServlet extends HttpServlet {
                     for (Order o : unpaidOrders) {
                         o.setItems(orderDAO.findOrderItems(o.getId()));
                         com.restaurantManagementSystem.model.Bill b = bDao.findByOrderId(o.getId());
-                        if (b != null) billMap.put(o.getId(), b.getId());
+                        if (b != null)
+                            billMap.put(o.getId(), b.getId());
                     }
                     req.setAttribute("orders", unpaidOrders);
                     req.setAttribute("billMap", billMap);
@@ -298,7 +298,7 @@ public class AdminServlet extends HttpServlet {
     }
 
     // ── Table management ──────────────────────────────────
-    
+
     private void handleTablePost(HttpServletRequest req, HttpServletResponse resp, String action)
             throws Exception {
         if ("create".equals(action)) {
@@ -375,9 +375,6 @@ public class AdminServlet extends HttpServlet {
         switch (action == null ? "" : action) {
             case "create": {
                 Reservation res = new Reservation();
-                res.setGuestName(req.getParameter("guestName"));
-                res.setGuestPhone(req.getParameter("guestPhone"));
-                res.setGuestEmail(req.getParameter("guestEmail"));
                 String psize = req.getParameter("partySize");
                 res.setPartySize(psize != null ? Integer.parseInt(psize) : 2);
                 String date = req.getParameter("date");
@@ -416,7 +413,7 @@ public class AdminServlet extends HttpServlet {
             feedback.setServiceRating(rating(req, "serviceRating"));
             feedback.setAmbienceRating(rating(req, "ambienceRating"));
             feedback.setOverallRating(rating(req, "overallRating"));
-             feedback.setComments(required(req, "comments", "Feedback comments are required."));
+            feedback.setComments(required(req, "comments", "Feedback comments are required."));
             feedbackDAO.create(feedback);
             setFlash(req, "success", "Feedback added for " + feedback.getGuestName() + ".");
         }

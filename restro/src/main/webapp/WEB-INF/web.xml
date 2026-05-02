@@ -113,7 +113,7 @@
         <url-pattern>/customer/menu</url-pattern>
         <url-pattern>/customer/order</url-pattern>
         <url-pattern>/customer/bill</url-pattern>
-    </servlet-mapping>
+        <url-pattern>/customer/reservation</url-pattern>        <url-pattern>/customer/feedback</url-pattern>    </servlet-mapping>
 
     <servlet>
         <servlet-name>PaymentController</servlet-name>

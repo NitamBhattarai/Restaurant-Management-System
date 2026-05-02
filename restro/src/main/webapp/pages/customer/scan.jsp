@@ -70,6 +70,12 @@
           <span class="flex items-center gap-1.5"><span class="w-2 h-2 rounded border border-black/10 bg-paper3 inline-block opacity-50"></span>Occupied</span>
           <span class="flex items-center gap-1.5"><span class="w-2 h-2 rounded border border-amber-300/60 bg-amber-50 inline-block opacity-60"></span>Reserved</span>
         </div>
+        <div class="mt-6 text-center">
+          <a href="${pageContext.request.contextPath}/customer/reservation"
+             class="inline-flex items-center justify-center rounded-full border border-black/10 bg-white px-4 py-2 text-sm font-medium text-ink hover:border-forest hover:text-forest transition-colors">
+            Reserve a table in advance
+          </a>
+        </div>
       </div>
 
       <div class="px-6 pb-5 text-center text-xs text-muted font-light border-t border-black/8 pt-4">
