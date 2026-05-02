@@ -1,7 +1,7 @@
 <%@ page contentType="text/html;charset=UTF-8" import="java.util.*,com.restaurantManagementSystem.model.*" %>
-<%@ taglib prefix="c" uri="http://xmlns.jcp.org/jsp/jstl/core" %>
-<%@ taglib prefix="fmt" uri="http://java.sun.com/jsp/jstl/fmt" %>
-<%@ taglib prefix="fn" uri="http://java.sun.com/jsp/jstl/functions" %>
+<%@ taglib prefix="c" uri="jakarta.tags.core" %>
+<%@ taglib prefix="fmt" uri="jakarta.tags.fmt" %>
+<%@ taglib prefix="fn" uri="jakarta.tags.functions" %>
 <c:set var="pageTitle" value="Billing Central"/>
 <%@ include file="/pages/errorpages/header.jsp" %>
 <%@ include file="/pages/errorpages/admin-sidebar.jsp" %>
@@ -254,6 +254,84 @@
       </div>
     </div>
 
+    <div id="reviews" class="mt-6 grid grid-cols-[1.1fr_1.9fr] gap-6">
+      <div class="bg-white border border-black/10 rounded-3xl p-6 shadow-sm">
+        <div class="flex items-start justify-between gap-4 mb-7">
+          <div>
+            <div class="text-[13.5px] font-semibold text-ink">Review Summary</div>
+            <div class="text-xs text-muted mt-1">Guest sentiment from recent service</div>
+          </div>
+          <span class="text-xs text-forest bg-forest/10 border border-forest/15 rounded-full px-3 py-1">Live</span>
+        </div>
+        <div class="flex items-end gap-4 mb-7">
+          <div class="font-serif text-6xl font-semibold text-forest leading-none">4.8</div>
+          <div class="pb-2">
+            <div class="text-gold text-xl tracking-wide">★★★★★</div>
+            <div class="text-sm text-muted mt-1">128 total reviews</div>
+          </div>
+        </div>
+        <div class="space-y-3">
+          <div>
+            <div class="flex justify-between text-xs text-muted mb-1"><span>Food Quality</span><span>96%</span></div>
+            <div class="h-2 rounded-full bg-paper2 overflow-hidden"><div class="h-full w-[96%] bg-forest rounded-full"></div></div>
+          </div>
+          <div>
+            <div class="flex justify-between text-xs text-muted mb-1"><span>Service</span><span>91%</span></div>
+            <div class="h-2 rounded-full bg-paper2 overflow-hidden"><div class="h-full w-[91%] bg-forest rounded-full"></div></div>
+          </div>
+          <div>
+            <div class="flex justify-between text-xs text-muted mb-1"><span>Ambience</span><span>88%</span></div>
+            <div class="h-2 rounded-full bg-paper2 overflow-hidden"><div class="h-full w-[88%] bg-gold rounded-full"></div></div>
+          </div>
+        </div>
+      </div>
+
+      <div class="bg-white border border-black/10 rounded-3xl overflow-hidden shadow-sm">
+        <div class="px-6 py-5 border-b border-black/10 flex items-center justify-between">
+          <div>
+            <div class="text-[13.5px] font-semibold text-ink">Recent Guest Reviews</div>
+            <div class="text-xs text-muted mt-1">Latest feedback for floor and kitchen teams</div>
+          </div>
+          <a href="${pageContext.request.contextPath}/admin/reports"
+             class="text-xs border border-black/16 text-ink2 px-3 py-1.5 rounded hover:border-forest hover:text-forest transition-all">
+            View Reports
+          </a>
+        </div>
+        <div class="divide-y divide-black/10">
+          <div class="px-6 py-5 flex gap-4">
+            <div class="w-11 h-11 rounded-full bg-forest text-white flex items-center justify-center font-serif text-lg shrink-0">A</div>
+            <div class="min-w-0 flex-1">
+              <div class="flex items-center justify-between gap-4">
+                <div class="font-semibold text-ink">Aarav Shrestha</div>
+                <div class="text-gold text-sm">★★★★★</div>
+              </div>
+              <p class="text-sm text-muted mt-2 leading-relaxed">The herb salad and service timing were excellent. Table staff handled a busy dinner smoothly.</p>
+            </div>
+          </div>
+          <div class="px-6 py-5 flex gap-4">
+            <div class="w-11 h-11 rounded-full bg-[#f4ead6] text-[#8a6010] flex items-center justify-center font-serif text-lg shrink-0">M</div>
+            <div class="min-w-0 flex-1">
+              <div class="flex items-center justify-between gap-4">
+                <div class="font-semibold text-ink">Mira Gurung</div>
+                <div class="text-gold text-sm">★★★★☆</div>
+              </div>
+              <p class="text-sm text-muted mt-2 leading-relaxed">Loved the dessert presentation. Main course arrived a little late, but the team recovered well.</p>
+            </div>
+          </div>
+          <div class="px-6 py-5 flex gap-4">
+            <div class="w-11 h-11 rounded-full bg-paper2 text-forest flex items-center justify-center font-serif text-lg shrink-0">S</div>
+            <div class="min-w-0 flex-1">
+              <div class="flex items-center justify-between gap-4">
+                <div class="font-semibold text-ink">Sanjay Lama</div>
+                <div class="text-gold text-sm">★★★★★</div>
+              </div>
+              <p class="text-sm text-muted mt-2 leading-relaxed">QR ordering was simple and the bill was ready immediately. Good experience for a group dinner.</p>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+
   </div>
 </div>
 
@@ -281,5 +359,3 @@
 </script>
 </body>
 </html>
-
-

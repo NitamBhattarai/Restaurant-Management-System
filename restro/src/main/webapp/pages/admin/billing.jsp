@@ -1,6 +1,6 @@
 <%@ page contentType="text/html;charset=UTF-8" import="com.restaurantManagementSystem.model.*" %>
-<%@ taglib prefix="c" uri="http://xmlns.jcp.org/jsp/jstl/core" %>
-<%@ taglib prefix="fmt" uri="http://java.sun.com/jsp/jstl/fmt" %>
+<%@ taglib prefix="c" uri="jakarta.tags.core" %>
+<%@ taglib prefix="fmt" uri="jakarta.tags.fmt" %>
 <c:set var="pageTitle" value="Billing"/>
 <%@ include file="/pages/errorpages/header.jsp" %>
 <%@ include file="/pages/errorpages/admin-sidebar.jsp" %>

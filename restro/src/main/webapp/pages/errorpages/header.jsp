@@ -1,5 +1,5 @@
 <%-- views/shared/header.jsp — included in every page --%> <%@ taglib prefix="c"
-uri="http://xmlns.jcp.org/jsp/jstl/core" %>
+uri="jakarta.tags.core" %>
 <!DOCTYPE html>
 <html lang="en">
   <head>
@@ -118,5 +118,4 @@ uri="http://xmlns.jcp.org/jsp/jstl/core" %>
       }
     </style>
   </head>
-  <body class="antialiased"></body>
-</html>
+  <body class="antialiased">

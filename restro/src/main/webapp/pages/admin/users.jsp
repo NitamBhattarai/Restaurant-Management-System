@@ -1,5 +1,5 @@
 <%@ page contentType="text/html;charset=UTF-8" import="com.restaurantManagementSystem.model.*" %>
-<%@ taglib prefix="c" uri="http://xmlns.jcp.org/jsp/jstl/core" %>
+<%@ taglib prefix="c" uri="jakarta.tags.core" %>
 <c:set var="pageTitle" value="Users & Roles"/>
 <%@ include file="/pages/errorpages/header.jsp" %>
 <%@ include file="/pages/errorpages/admin-sidebar.jsp" %>

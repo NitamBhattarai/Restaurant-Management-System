@@ -2,8 +2,8 @@
 <web-app xmlns="https://jakarta.ee/xml/ns/jakartaee"
          xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
          xsi:schemaLocation="https://jakarta.ee/xml/ns/jakartaee
-         https://jakarta.ee/xml/ns/jakartaee/web-app_6_0.xsd"
-         version="6.0">
+         https://jakarta.ee/xml/ns/jakartaee/web-app_5_0.xsd"
+         version="5.0">
 
     <display-name>Gokyo Bistro - Restaurant QR Ordering System</display-name>
     <description>CS5054NT Advanced Programming Technologies Coursework</description>
@@ -62,6 +62,11 @@
     <servlet>
         <servlet-name>AdminController</servlet-name>
         <servlet-class>com.restaurantManagementSystem.controller.AdminController</servlet-class>
+        <multipart-config>
+            <max-file-size>5242880</max-file-size>
+            <max-request-size>6291456</max-request-size>
+            <file-size-threshold>1048576</file-size-threshold>
+        </multipart-config>
     </servlet>
     <servlet-mapping>
         <servlet-name>AdminController</servlet-name>
@@ -75,6 +80,7 @@
         <url-pattern>/admin/users</url-pattern>
         <url-pattern>/admin/settings</url-pattern>
         <url-pattern>/admin/reservations</url-pattern>
+        <url-pattern>/admin/feedback</url-pattern>
     </servlet-mapping>
 
     <servlet>

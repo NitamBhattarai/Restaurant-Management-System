@@ -1,6 +1,6 @@
 <%-- ═══ 404 ERROR PAGE ═══ --%>
 <%@ page contentType="text/html;charset=UTF-8" isErrorPage="true" %>
-<%@ taglib prefix="c" uri="http://java.sun.com/jsp/jstl/core" %>
+<%@ taglib prefix="c" uri="jakarta.tags.core" %>
 <c:set var="pageTitle" value="Page Not Found"/>
 <%@ include file="/pages/errorpages/header.jsp" %>
 <nav class="h-16 flex items-center px-12 bg-white/96 border-b border-black/10">

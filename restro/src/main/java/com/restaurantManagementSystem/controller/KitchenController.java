@@ -4,7 +4,6 @@ import com.restaurantManagementSystem.dao.OrderDAO;
 import com.restaurantManagementSystem.model.Order;
 
 import jakarta.servlet.*;
-import jakarta.servlet.annotation.WebServlet;
 import jakarta.servlet.http.*;
 import java.io.IOException;
 import java.util.List;
@@ -18,7 +17,6 @@ import java.util.List;
  *
  * MVC Role: Controller
  */
-@WebServlet(name = "KitchenController", urlPatterns = {"/kitchen/display", "/kitchen/update"})
 public class KitchenController extends HttpServlet {
 
     private final OrderDAO orderDAO = new OrderDAO();

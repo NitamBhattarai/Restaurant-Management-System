@@ -1,7 +1,7 @@
 <%@ page contentType="text/html;charset=UTF-8" %>
-<%@ taglib prefix="c" uri="http://xmlns.jcp.org/jsp/jstl/core" %>
-<%@ taglib prefix="fmt" uri="http://java.sun.com/jsp/jstl/fmt" %>
-<%@ taglib prefix="fn"  uri="http://java.sun.com/jsp/jstl/functions" %>
+<%@ taglib prefix="c" uri="jakarta.tags.core" %>
+<%@ taglib prefix="fmt" uri="jakarta.tags.fmt" %>
+<%@ taglib prefix="fn"  uri="jakarta.tags.functions" %>
 <c:set var="pageTitle" value="Reservations"/>
 <%@ include file="/pages/errorpages/header.jsp" %>
 <%@ include file="/pages/errorpages/admin-sidebar.jsp" %>

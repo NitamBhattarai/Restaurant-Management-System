@@ -9,7 +9,6 @@ import com.restaurantManagementSystem.model.Payment;
 import com.restaurantManagementSystem.model.User;
 
 import jakarta.servlet.*;
-import jakarta.servlet.annotation.WebServlet;
 import jakarta.servlet.http.*;
 import java.io.IOException;
 import java.math.BigDecimal;
@@ -38,7 +37,6 @@ import java.math.BigDecimal;
  *
  * MVC Role: Controller
  */
-@WebServlet(name = "PaymentController", urlPatterns = {"/admin/payment/process"})
 public class PaymentController extends HttpServlet {
 
     private final PaymentDAO paymentDAO = new PaymentDAO();

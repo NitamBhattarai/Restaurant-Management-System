@@ -5,11 +5,17 @@ import com.restaurantManagementSystem.model.*;
 import com.restaurantManagementSystem.model.Reservation;
 
 import jakarta.servlet.*;
-import jakarta.servlet.annotation.WebServlet;
 import jakarta.servlet.http.*;
 import java.io.IOException;
+import java.io.InputStream;
 import java.math.BigDecimal;
+import java.nio.file.Files;
+import java.nio.file.Path;
+import java.nio.file.Paths;
+import java.nio.file.StandardCopyOption;
 import java.util.List;
+import java.util.Locale;
+import java.util.UUID;
 
 ///**
 // * AdminController — handles all admin dashboard pages.
@@ -31,12 +37,6 @@ import java.util.List;
 // *
 // * MVC Role: Controller
 // */
-@WebServlet(name = "AdminController", urlPatterns = {
-        "/admin/dashboard", "/admin/orders", "/admin/menu",
-        "/admin/tables", "/admin/billing", "/admin/reports",
-        "/admin/payments", "/admin/users", "/admin/settings",
-        "/admin/reservations"
-})
 public class AdminController extends HttpServlet {
 
     // ── DAOs (Model layer) ────────────────────────────────
@@ -45,6 +45,7 @@ public class AdminController extends HttpServlet {
     private final TableDAO tableDAO = new TableDAO();
     private final UserDAO userDAO = new UserDAO();
     private final PaymentDAO paymentDAO = new PaymentDAO();
+    private final FeedbackDAO feedbackDAO = new FeedbackDAO();
 
     // ── GET ───────────────────────────────────────────────
 
@@ -119,6 +120,14 @@ public class AdminController extends HttpServlet {
                     forward(req, resp, "/pages/admin/reservations.jsp");
                     break;
 
+                case "/admin/feedback":
+                    List<Feedback> feedback = feedbackDAO.findAll();
+                    req.setAttribute("feedbackList", feedback);
+                    req.setAttribute("averageRating", feedbackDAO.averageRating(feedback));
+                    req.setAttribute("positiveCount", feedbackDAO.countPositive(feedback));
+                    forward(req, resp, "/pages/admin/feedback.jsp");
+                    break;
+
                 default:
                     resp.sendRedirect(req.getContextPath() + "/admin/dashboard");
             }
@@ -150,6 +159,9 @@ public class AdminController extends HttpServlet {
                 case "/admin/reservations":
                     handleReservationPost(req, resp, action);
                     break;
+                case "/admin/feedback":
+                    handleFeedbackPost(req, resp, action);
+                    break;
                 default:
                     resp.sendRedirect(req.getContextPath() + path);
             }
@@ -179,6 +191,7 @@ public class AdminController extends HttpServlet {
                 item.setDescription(req.getParameter("description"));
                 item.setPrice(new BigDecimal(price));
                 item.setEmoji(req.getParameter("emoji"));
+                item.setImageUrl(saveUploadedMenuImage(req));
                 menuDAO.create(item);
                 setFlash(req, "success", "Menu item added: " + name);
                 break;
@@ -200,6 +213,10 @@ public class AdminController extends HttpServlet {
                     item.setPrice(new BigDecimal(price));
                     item.setAvailable("1".equals(req.getParameter("available")));
                     item.setEmoji(req.getParameter("emoji"));
+                    String imageUrl = saveUploadedMenuImage(req);
+                    if (imageUrl != null) {
+                        item.setImageUrl(imageUrl);
+                    }
                     menuDAO.update(item);
                     setFlash(req, "success", "Item updated successfully.");
                 }
@@ -214,6 +231,41 @@ public class AdminController extends HttpServlet {
             }
         }
         resp.sendRedirect(req.getContextPath() + "/admin/menu");
+    }
+
+    private String saveUploadedMenuImage(HttpServletRequest req) throws IOException, ServletException {
+        Part imagePart = req.getPart("imageFile");
+        if (imagePart == null || imagePart.getSize() == 0) {
+            return null;
+        }
+
+        String originalFileName = imagePart.getSubmittedFileName();
+        if (originalFileName == null || originalFileName.isBlank()) {
+            return null;
+        }
+        String submittedName = Paths.get(originalFileName).getFileName().toString();
+        String lowerName = submittedName.toLowerCase(Locale.ROOT);
+        String extension = ".jpg";
+        int dot = lowerName.lastIndexOf('.');
+        if (dot >= 0) {
+            extension = lowerName.substring(dot);
+        }
+        if (!extension.matches("\\.(jpg|jpeg|png|gif|webp)$")) {
+            throw new ServletException("Only JPG, PNG, GIF, and WEBP images are allowed.");
+        }
+
+        String uploadRoot = req.getServletContext().getRealPath("/uploads/menu");
+        if (uploadRoot == null) {
+            throw new ServletException("Upload directory is not available for this deployment.");
+        }
+
+        Files.createDirectories(Paths.get(uploadRoot));
+        String fileName = UUID.randomUUID() + extension;
+        Path destination = Paths.get(uploadRoot, fileName);
+        try (InputStream input = imagePart.getInputStream()) {
+            Files.copy(input, destination, StandardCopyOption.REPLACE_EXISTING);
+        }
+        return "/uploads/menu/" + fileName;
     }
 
     // ── Order status update ───────────────────────────────
@@ -323,6 +375,40 @@ public class AdminController extends HttpServlet {
     }
 
     // ── end of AdminController ────────────────────────────
+
+    private void handleFeedbackPost(HttpServletRequest req, HttpServletResponse resp, String action)
+            throws Exception {
+        if ("create".equals(action)) {
+            Feedback feedback = new Feedback();
+            feedback.setGuestName(required(req, "guestName", "Guest name is required."));
+            feedback.setGuestEmail(req.getParameter("guestEmail"));
+            feedback.setTableNumber(req.getParameter("tableNumber"));
+            feedback.setCuisineRating(rating(req, "cuisineRating"));
+            feedback.setServiceRating(rating(req, "serviceRating"));
+            feedback.setAmbienceRating(rating(req, "ambienceRating"));
+            feedback.setOverallRating(rating(req, "overallRating"));
+            feedback.setComments(required(req, "comments", "Feedback comments are required."));
+            feedbackDAO.create(feedback);
+            setFlash(req, "success", "Feedback added for " + feedback.getGuestName() + ".");
+        }
+        resp.sendRedirect(req.getContextPath() + "/admin/feedback");
+    }
+
+    private String required(HttpServletRequest req, String name, String message) {
+        String value = req.getParameter(name);
+        if (value == null || value.isBlank()) {
+            throw new IllegalArgumentException(message);
+        }
+        return value.trim();
+    }
+
+    private int rating(HttpServletRequest req, String name) {
+        int value = Integer.parseInt(required(req, name, "Rating is required."));
+        if (value < 1 || value > 5) {
+            throw new IllegalArgumentException("Ratings must be between 1 and 5.");
+        }
+        return value;
+    }
 
     private void forward(HttpServletRequest req, HttpServletResponse resp, String view)
             throws ServletException, IOException {

@@ -74,15 +74,16 @@ public class MenuItemDAO {
 
     /** Insert a new menu item. Returns generated ID. */
     public int create(MenuItem item) throws SQLException {
-        String sql = "INSERT INTO menu_items(category_id, name, description, price, emoji, available) "
-                   + "VALUES(?, ?, ?, ?, ?, 1)";
+        String sql = "INSERT INTO menu_items(category_id, name, description, price, emoji, image_url, available) "
+                   + "VALUES(?, ?, ?, ?, ?, ?, 1)";
         try (Connection conn = DBConnection.getConnection();
              PreparedStatement ps = conn.prepareStatement(sql, Statement.RETURN_GENERATED_KEYS)) {
             ps.setInt(1, item.getCategoryId());
             ps.setString(2, item.getName());
             ps.setString(3, item.getDescription());
             ps.setBigDecimal(4, item.getPrice());
-            ps.setString(5, item.getEmoji() != null ? item.getEmoji() : "🍽️");
+            ps.setString(5, item.getEmoji() != null ? item.getEmoji() : "Food");
+            ps.setString(6, item.getImageUrl());
             ps.executeUpdate();
             try (ResultSet gk = ps.getGeneratedKeys()) {
                 if (gk.next()) return gk.getInt(1);
@@ -96,7 +97,7 @@ public class MenuItemDAO {
     /** Update an existing item's details. */
     public boolean update(MenuItem item) throws SQLException {
         String sql = "UPDATE menu_items "
-                   + "SET category_id=?, name=?, description=?, price=?, emoji=?, available=? "
+                   + "SET category_id=?, name=?, description=?, price=?, emoji=?, image_url=?, available=? "
                    + "WHERE id=?";
         try (Connection conn = DBConnection.getConnection();
              PreparedStatement ps = conn.prepareStatement(sql)) {
@@ -105,8 +106,9 @@ public class MenuItemDAO {
             ps.setString(3, item.getDescription());
             ps.setBigDecimal(4, item.getPrice());
             ps.setString(5, item.getEmoji());
-            ps.setBoolean(6, item.isAvailable());
-            ps.setInt(7, item.getId());
+            ps.setString(6, item.getImageUrl());
+            ps.setBoolean(7, item.isAvailable());
+            ps.setInt(8, item.getId());
             return ps.executeUpdate() > 0;
         }
     }

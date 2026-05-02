@@ -4,7 +4,6 @@ import com.restaurantManagementSystem.dao.UserDAO;
 import com.restaurantManagementSystem.model.User;
 
 import jakarta.servlet.*;
-import jakarta.servlet.annotation.WebServlet;
 import jakarta.servlet.http.*;
 import java.io.IOException;
 
@@ -21,8 +20,6 @@ import java.io.IOException;
  *
  * MVC Role: Controller
  */
-@WebServlet(name = "AuthController", urlPatterns = { "/admin/login", "/admin/logout", "/kitchen/login",
-        "/kitchen/logout" })
 public class AuthController extends HttpServlet {
 
     private final UserDAO userDAO = new UserDAO();

@@ -11,7 +11,6 @@ import com.restaurantManagementSystem.model.OrderItem;
 import com.restaurantManagementSystem.model.User;
 
 import jakarta.servlet.ServletException;
-import jakarta.servlet.annotation.WebServlet;
 import jakarta.servlet.http.HttpServlet;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
@@ -21,10 +20,6 @@ import java.math.BigDecimal;
 import java.util.ArrayList;
 import java.util.List;
 
-@WebServlet(
-        name = "CustomerController",
-        urlPatterns = {"/customer/scan", "/customer/menu", "/customer/order", "/customer/bill"}
-)
 public class CustomerController extends HttpServlet {
 
     private final MenuItemDAO menuDAO = new MenuItemDAO();
