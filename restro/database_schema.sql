@@ -37,7 +37,7 @@ CREATE TABLE IF NOT EXISTS menu_items (
     category_id INT           NOT NULL,
     name        VARCHAR(120)  NOT NULL,
     description TEXT,
-    price       DECIMAL(10,2) NOT NULL,
+    price       DECIMAL(10,2) NOT NULL CHECK (price > 0),
     emoji       VARCHAR(10)   DEFAULT '🍽️',
     image_url   VARCHAR(300),
     available   TINYINT(1)    NOT NULL DEFAULT 1,

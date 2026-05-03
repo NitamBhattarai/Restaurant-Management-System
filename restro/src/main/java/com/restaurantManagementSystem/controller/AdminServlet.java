@@ -3,6 +3,7 @@ package com.restaurantManagementSystem.controller;
 import com.restaurantManagementSystem.dao.*;
 import com.restaurantManagementSystem.model.*;
 import com.restaurantManagementSystem.model.Reservation;
+import com.restaurantManagementSystem.util.ValidationUtil;
 
 import jakarta.servlet.*;
 import jakarta.servlet.http.*;
@@ -13,6 +14,7 @@ import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.nio.file.StandardCopyOption;
+import java.sql.SQLIntegrityConstraintViolationException;
 import java.util.List;
 import java.util.Locale;
 import java.util.UUID;
@@ -196,16 +198,21 @@ public class AdminServlet extends HttpServlet {
             case "create": {
                 // Validate: name and price must not be blank
                 String name = req.getParameter("name");
-                String price = req.getParameter("price");
-                if (name == null || name.isBlank() || price == null || price.isBlank()) {
+                String priceInput = req.getParameter("price");
+                if (name == null || name.isBlank() || priceInput == null || priceInput.isBlank()) {
                     setFlash(req, "error", "Name and price are required.");
+                    break;
+                }
+                BigDecimal price = parseMenuPrice(priceInput);
+                if (price == null) {
+                    setFlash(req, "error", "Price must be a positive number.");
                     break;
                 }
                 MenuItem item = new MenuItem();
                 item.setCategoryId(Integer.parseInt(req.getParameter("categoryId")));
                 item.setName(name.trim());
                 item.setDescription(req.getParameter("description"));
-                item.setPrice(new BigDecimal(price));
+                item.setPrice(price);
                 item.setEmoji(req.getParameter("emoji"));
                 item.setImageUrl(saveUploadedMenuImage(req));
                 menuDAO.create(item);
@@ -215,9 +222,14 @@ public class AdminServlet extends HttpServlet {
 
             case "update": {
                 String name = req.getParameter("name");
-                String price = req.getParameter("price");
-                if (name == null || name.isBlank() || price == null || price.isBlank()) {
+                String priceInput = req.getParameter("price");
+                if (name == null || name.isBlank() || priceInput == null || priceInput.isBlank()) {
                     setFlash(req, "error", "Name and price are required.");
+                    break;
+                }
+                BigDecimal price = parseMenuPrice(priceInput);
+                if (price == null) {
+                    setFlash(req, "error", "Price must be a positive number.");
                     break;
                 }
                 int id = Integer.parseInt(req.getParameter("id"));
@@ -226,7 +238,7 @@ public class AdminServlet extends HttpServlet {
                     item.setCategoryId(Integer.parseInt(req.getParameter("categoryId")));
                     item.setName(name.trim());
                     item.setDescription(req.getParameter("description"));
-                    item.setPrice(new BigDecimal(price));
+                    item.setPrice(price);
                     item.setAvailable("1".equals(req.getParameter("available")));
                     item.setEmoji(req.getParameter("emoji"));
                     String imageUrl = saveUploadedMenuImage(req);
@@ -241,12 +253,26 @@ public class AdminServlet extends HttpServlet {
 
             case "delete": {
                 int id = Integer.parseInt(req.getParameter("id"));
-                menuDAO.delete(id);
-                setFlash(req, "success", "Item removed from menu.");
+                try {
+                    if (menuDAO.delete(id)) {
+                        setFlash(req, "success", "Item removed from menu.");
+                    } else {
+                        setFlash(req, "error", "Menu item was not found.");
+                    }
+                } catch (SQLIntegrityConstraintViolationException e) {
+                    setFlash(req, "error", "This item has order history and cannot be permanently removed.");
+                }
                 break;
             }
         }
         resp.sendRedirect(req.getContextPath() + "/admin/menu");
+    }
+
+    private BigDecimal parseMenuPrice(String priceInput) {
+        if (!ValidationUtil.isPositiveDecimal(priceInput)) {
+            return null;
+        }
+        return new BigDecimal(priceInput.trim());
     }
 
     private String saveUploadedMenuImage(HttpServletRequest req) throws IOException, ServletException {

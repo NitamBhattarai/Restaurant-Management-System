@@ -52,6 +52,12 @@
         <c:remove var="flashSuccess" scope="session"/>
       </div>
     </c:if>
+    <c:if test="${not empty sessionScope.flashError}">
+      <div class="bg-red-50 border border-red-200 text-red-800 text-sm px-4 py-3 rounded mb-6">
+        <c:out value="${sessionScope.flashError}"/>
+        <c:remove var="flashError" scope="session"/>
+      </div>
+    </c:if>
 
     <section class="mb-8 border-b border-black/5 pb-6">
       <h1 class="font-serif text-[28px] font-bold text-[#114b3e] mb-1">Menu Catalog</h1>
@@ -214,7 +220,7 @@
           <div class="grid grid-cols-2 gap-4 mb-4">
             <div>
               <label class="block text-[10px] uppercase tracking-widest font-bold text-muted mb-2">Price (रू)</label>
-              <input name="price" id="editPrice" type="number" step="0.01" required class="w-full px-3 py-2 bg-[#f4f5f5] rounded text-[13px] text-ink outline-none focus:ring-1 focus:ring-[#114b3e]/20">
+              <input name="price" id="editPrice" type="number" min="0.01" step="0.01" required class="w-full px-3 py-2 bg-[#f4f5f5] rounded text-[13px] text-ink outline-none focus:ring-1 focus:ring-[#114b3e]/20">
             </div>
             <div>
               <label class="block text-[10px] uppercase tracking-widest font-bold text-muted mb-2">Emoji</label>
@@ -279,7 +285,7 @@
           <div class="grid grid-cols-2 gap-4 mb-4">
             <div>
               <label class="block text-[10px] uppercase tracking-widest font-bold text-muted mb-2">Price (रू)</label>
-              <input name="price" type="number" step="0.01" required placeholder="850" class="w-full px-3 py-2 bg-[#f4f5f5] rounded text-[13px] text-ink outline-none focus:ring-1 focus:ring-[#114b3e]/20">
+              <input name="price" type="number" min="0.01" step="0.01" required placeholder="850" class="w-full px-3 py-2 bg-[#f4f5f5] rounded text-[13px] text-ink outline-none focus:ring-1 focus:ring-[#114b3e]/20">
             </div>
             <div>
               <label class="block text-[10px] uppercase tracking-widest font-bold text-muted mb-2">Emoji</label>

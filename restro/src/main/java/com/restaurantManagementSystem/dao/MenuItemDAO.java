@@ -113,11 +113,11 @@ public class MenuItemDAO {
         }
     }
 
-    // ── DELETE (soft) ─────────────────────────────────────
+    // ── DELETE ─────────────────────────────────────
 
-    /** Soft-delete: mark item as unavailable rather than removing data. */
+    /** Permanently remove a menu item from the system. */
     public boolean delete(int id) throws SQLException {
-        String sql = "UPDATE menu_items SET available = 0 WHERE id = ?";
+        String sql = "DELETE FROM menu_items WHERE id = ?";
         try (Connection conn = DBConnection.getConnection();
              PreparedStatement ps = conn.prepareStatement(sql)) {
             ps.setInt(1, id);
