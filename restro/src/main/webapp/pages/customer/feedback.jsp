@@ -2,6 +2,8 @@
 <%@ taglib prefix="c" uri="jakarta.tags.core" %>
 <c:set var="pageTitle" value="Guest Feedback"/>
 <%@ include file="/pages/errorpages/header.jsp" %>
+<c:set var="feedbackHeroImg" value="https://images.unsplash.com/photo-1517248135467-4c7edcad34c4?w=1200&auto=format&fit=crop" />
+<c:url var="feedbackFallbackImg" value="/assets/images/feedback-dining.png" />
 
 <div class="min-h-[calc(100vh-64px)] bg-paper py-12 px-4">
   <div class="mx-auto max-w-6xl">
@@ -21,7 +23,13 @@
                 <p>• Atmosphere and comfort</p>
               </div>
             </div>
-            <div class="rounded-3xl overflow-hidden bg-black/5 h-[320px]"></div>
+            <div class="rounded-3xl overflow-hidden bg-black/5 h-[320px]">
+              <img src="${feedbackHeroImg}"
+                   alt="Dining experience at Gokyo Bistro"
+                   class="w-full h-full object-cover"
+                   loading="eager"
+                   onerror="this.onerror=null;this.src='${feedbackFallbackImg}';"/>
+            </div>
           </div>
         </div>
       </section>
@@ -56,6 +64,7 @@
           <label class="block">
             <div class="text-[10px] uppercase tracking-widest text-muted mb-2">Table number (optional)</div>
             <input name="tableNumber" type="text" placeholder="T12"
+                   value="${not empty param.table ? param.table : ''}"
                    class="gk-field w-full px-4 py-3 rounded-2xl border border-black/10 bg-white text-sm outline-none"/>
           </label>
 

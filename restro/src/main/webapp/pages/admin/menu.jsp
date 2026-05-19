@@ -3,8 +3,35 @@
 <%@ taglib prefix="fmt" uri="jakarta.tags.fmt" %>
 <%@ taglib prefix="fn" uri="jakarta.tags.functions" %>
 <c:set var="pageTitle" value="Menu Catalog"/>
+<c:set var="ctx" value="${pageContext.request.contextPath}" />
 <%@ include file="/pages/errorpages/header.jsp" %>
 <%@ include file="/pages/errorpages/admin-sidebar.jsp" %>
+
+<%
+  java.util.Map<Integer, String> uniqueImages = new java.util.HashMap<>();
+  uniqueImages.put(1, "https://images.unsplash.com/photo-1544025162-8111142154ea?w=600&auto=format&fit=crop");
+  uniqueImages.put(2, "https://images.unsplash.com/photo-1573140247632-f8fd74997d5c?w=600&auto=format&fit=crop");
+  uniqueImages.put(3, "https://images.unsplash.com/photo-1547592166-23ac45744acd?w=600&auto=format&fit=crop");
+  uniqueImages.put(4, "https://images.unsplash.com/photo-1496116218417-1a781b1c416c?w=600&auto=format&fit=crop");
+  uniqueImages.put(5, "https://images.unsplash.com/photo-1555939594-58d7cb561ad1?w=600&auto=format&fit=crop");
+  uniqueImages.put(6, "https://images.unsplash.com/photo-1588166524941-3bf61a9c41db?w=600&auto=format&fit=crop");
+  uniqueImages.put(7, "https://images.unsplash.com/photo-1485921325833-c519f76c4927?w=600&auto=format&fit=crop");
+  uniqueImages.put(8, "https://images.unsplash.com/photo-1626776876729-bab4369a5a5a?w=600&auto=format&fit=crop");
+  uniqueImages.put(9, "https://images.unsplash.com/photo-1512621776951-a57141f2eefd?w=600&auto=format&fit=crop");
+  uniqueImages.put(10, "https://images.unsplash.com/photo-1513104890138-7c749659a591?w=600&auto=format&fit=crop");
+  uniqueImages.put(11, "https://images.unsplash.com/photo-1473093295043-cdd812d0e601?w=600&auto=format&fit=crop");
+  uniqueImages.put(12, "https://images.unsplash.com/photo-1555939594-58d7cb561ad1?w=600&auto=format&fit=crop");
+  uniqueImages.put(13, "https://images.unsplash.com/photo-1546852199-0d32cb9622d1?w=600&auto=format&fit=crop");
+  uniqueImages.put(14, "https://images.unsplash.com/photo-1561336313-0bd5e0b27ec8?w=600&auto=format&fit=crop");
+  uniqueImages.put(15, "https://images.unsplash.com/photo-1513558161293-cdaf765ed2fd?w=600&auto=format&fit=crop");
+  uniqueImages.put(16, "https://images.unsplash.com/photo-1551538827-9c037cb4f32a?w=600&auto=format&fit=crop");
+  uniqueImages.put(17, "https://images.unsplash.com/photo-1506377247377-2a5b3b417ebb?w=600&auto=format&fit=crop");
+  uniqueImages.put(18, "https://images.unsplash.com/photo-1511381939415-e440c064a101?w=600&auto=format&fit=crop");
+  uniqueImages.put(19, "https://images.unsplash.com/photo-1601050690597-df0568f70950?w=600&auto=format&fit=crop");
+  uniqueImages.put(20, "https://images.unsplash.com/photo-1563805042-7684c8a9e9ce?w=600&auto=format&fit=crop");
+  uniqueImages.put(21, "https://images.unsplash.com/photo-1519869325930-281384150729?w=600&auto=format&fit=crop");
+  request.setAttribute("uniqueImages", uniqueImages);
+%>
 
 <style>
   .admin-image-drop {
@@ -38,7 +65,7 @@
     </div>
     <div class="flex items-center gap-4">
       <button class="w-8 h-8 flex items-center justify-center text-muted hover:text-ink transition-colors">🔔</button>
-      <button class="w-8 h-8 flex items-center justify-center text-muted hover:text-ink transition-colors">⚙️</button>
+      <a href="${pageContext.request.contextPath}/admin/settings" class="w-8 h-8 flex items-center justify-center text-muted hover:text-ink transition-colors">⚙️</a>
       <div class="w-7 h-7 rounded-full bg-ink text-white flex items-center justify-center text-[11px] font-bold">
         <c:choose><c:when test="${not empty currentUser.initials}">${currentUser.initials}</c:when><c:otherwise>AU</c:otherwise></c:choose>
       </div>
@@ -74,7 +101,7 @@
           </button>
           <c:forEach items="${categories}" var="cat">
             <button class="w-full text-left px-4 py-2.5 rounded-lg text-[13px] font-semibold text-muted hover:bg-[#f4f5f5] hover:text-ink transition-colors" data-filter="${fn:escapeXml(cat.name)}">
-              ${cat.name}
+                ${cat.name}
             </button>
           </c:forEach>
         </nav>
@@ -122,16 +149,26 @@
                      data-cat="${fn:escapeXml(item.categoryName)}"
                      data-search="${fn:toLowerCase(item.name)} ${fn:toLowerCase(item.categoryName)}">
               <!-- Image -->
-              <div class="h-40 bg-[#f4f5f5] relative flex items-center justify-center">
+              <div class="h-40 bg-[#f4f5f5] relative flex items-center justify-center overflow-hidden">
+                  <%-- A "real" image is either an external URL (http/https) or a servlet URL (/menu-image?file=...).
+                       DAO-injected local asset defaults (/assets/images/...) are not real uploads;
+                       for those we prefer the per-item Unsplash photo from uniqueImages. --%>
                 <c:choose>
-                  <c:when test="${not empty item.imageUrl}">
-                    <c:url value="${item.imageUrl}" var="itemImage"/>
-                    <img src="${itemImage}" alt="${item.name}" class="w-full h-full object-cover">
+                  <c:when test="${fn:startsWith(item.imageUrl, 'http')}">
+                    <%-- External URL (e.g. user pasted an https link) — use as-is --%>
+                    <c:set var="resolvedImg" value="${item.imageUrl}"/>
+                  </c:when>
+                  <c:when test="${fn:startsWith(item.imageUrl, '/menu-image')}">
+                    <%-- Real uploaded file served by ImageServlet — prepend context path --%>
+                    <c:set var="resolvedImg" value="${ctx}${item.imageUrl}"/>
                   </c:when>
                   <c:otherwise>
-                    <span class="text-4xl text-black/10">📷</span>
+                    <%-- No real upload: use the per-item Unsplash fallback, or a generic external dish image --%>
+                    <c:set var="resolvedImg" value="${not empty uniqueImages[item.id] ? uniqueImages[item.id] : 'https://images.unsplash.com/photo-1504674900247-0877df9cc836?auto=format&fit=crop&w=1400&q=80'}"/>
                   </c:otherwise>
                 </c:choose>
+                <img src="${resolvedImg}" alt="${fn:escapeXml(item.name)}" class="w-full h-full object-cover"
+                     onerror="this.onerror=null;this.src='https://images.unsplash.com/photo-1504674900247-0877df9cc836?auto=format&fit=crop&w=1400&q=80';">
                 <div class="absolute top-3 right-3 bg-white px-2 py-1 rounded text-[11px] font-bold text-ink shadow-sm">
                   रू <fmt:formatNumber value="${item.price}" pattern="#,##0"/>
                 </div>
@@ -141,7 +178,7 @@
               <div class="p-5">
                 <h3 class="text-[15px] font-bold text-ink leading-tight mb-1"><c:out value="${item.name}"/></h3>
                 <div class="text-[10px] uppercase tracking-widest font-semibold text-muted mb-4"><c:out value="${item.categoryName}"/></div>
-                
+
                 <div class="flex items-center gap-1.5 text-[11px] font-semibold text-muted mb-5">
                   <span class="text-ink font-bold">4.9</span> <span class="text-gold">★</span> (128 reviews)
                 </div>
@@ -150,13 +187,19 @@
                 <div class="flex items-center justify-between border-t border-black/5 pt-4">
                   <!-- Toggle Switch Mockup -->
                   <div class="flex items-center gap-2">
-                    <div class="relative inline-block w-8 mr-2 align-middle select-none transition duration-200 ease-in">
-                      <input type="checkbox" disabled ${item.available ? 'checked' : ''} class="toggle-checkbox absolute block w-4 h-4 rounded-full bg-white border-4 appearance-none cursor-pointer border-[#f4f5f5]"/>
-                      <label class="toggle-label block overflow-hidden h-4 rounded-full bg-[#f4f5f5] cursor-pointer"></label>
-                    </div>
+                    <form method="POST" action="${pageContext.request.contextPath}/admin/menu" class="inline-block">
+                      <input type="hidden" name="action" value="toggle">
+                      <input type="hidden" name="id" value="${item.id}">
+                      <input type="hidden" name="available" id="toggleAvailable-${item.id}" value="${item.available ? '1' : '0'}">
+                      <div class="relative inline-block w-8 mr-2 align-middle select-none transition duration-200 ease-in">
+                        <input id="toggle-${item.id}" type="checkbox" ${item.available ? 'checked' : ''} class="toggle-checkbox absolute block w-4 h-4 rounded-full bg-white border-4 appearance-none cursor-pointer border-[#f4f5f5]"
+                               onchange="document.getElementById('toggleAvailable-${item.id}').value = this.checked ? '1' : '0'; this.form.submit();"/>
+                        <label for="toggle-${item.id}" class="toggle-label block overflow-hidden h-4 rounded-full bg-[#f4f5f5] cursor-pointer"></label>
+                      </div>
+                    </form>
                     <span class="text-[11px] font-bold ${item.available ? 'text-[#114b3e]' : 'text-muted'}">${item.available ? 'Active' : 'Inactive'}</span>
                   </div>
-                  
+
                   <div class="flex gap-3">
                     <button type="button"
                             class="edit-menu-btn text-[11px] font-bold text-muted hover:text-[#114b3e] transition-colors uppercase tracking-widest"
@@ -238,11 +281,11 @@
         </div>
         <div>
           <label class="block text-[10px] uppercase tracking-widest font-bold text-muted mb-2">Menu Image</label>
-          <label class="admin-image-drop rounded-xl p-4 h-48 flex flex-col items-center justify-center text-center cursor-pointer hover:bg-[#114b3e]/5 transition-colors">
-            <img id="editImagePreview" alt="" class="hidden w-full h-full object-cover rounded mb-2">
-            <span class="text-[11px] font-bold text-[#114b3e]">Upload image</span>
-            <span class="text-[10px] text-muted mt-1">Max 5MB</span>
-            <input name="imageFile" type="file" accept="image/*" class="hidden" onchange="previewImage(this, 'editImagePreview')">
+          <label class="admin-image-drop rounded-xl p-4 h-48 flex flex-col items-center justify-center text-center cursor-pointer hover:bg-[#114b3e]/5 transition-colors relative overflow-hidden">
+            <img id="editImagePreview" alt="" class="hidden absolute inset-0 w-full h-full object-cover rounded">
+            <span id="editUploadText" class="text-[11px] font-bold text-[#114b3e]">Upload image</span>
+            <span id="editUploadHint" class="text-[10px] text-muted mt-1">Max 5MB</span>
+            <input name="imageFile" type="file" accept="image/*" class="hidden" onchange="previewImage(this, 'editImagePreview', 'editUploadText', 'editUploadHint')">
           </label>
         </div>
       </div>
@@ -299,11 +342,11 @@
         </div>
         <div>
           <label class="block text-[10px] uppercase tracking-widest font-bold text-muted mb-2">Menu Image</label>
-          <label class="admin-image-drop rounded-xl p-4 h-48 flex flex-col items-center justify-center text-center cursor-pointer hover:bg-[#114b3e]/5 transition-colors">
-            <img id="addImagePreview" alt="" class="hidden w-full h-full object-cover rounded mb-2">
-            <span class="text-[11px] font-bold text-[#114b3e]">Upload image</span>
-            <span class="text-[10px] text-muted mt-1">Max 5MB</span>
-            <input name="imageFile" type="file" accept="image/*" class="hidden" onchange="previewImage(this, 'addImagePreview')">
+          <label class="admin-image-drop rounded-xl p-4 h-48 flex flex-col items-center justify-center text-center cursor-pointer hover:bg-[#114b3e]/5 transition-colors relative overflow-hidden">
+            <img id="addImagePreview" alt="" class="hidden absolute inset-0 w-full h-full object-cover rounded">
+            <span id="addUploadText" class="text-[11px] font-bold text-[#114b3e]">Upload image</span>
+            <span id="addUploadHint" class="text-[10px] text-muted mt-1">Max 5MB</span>
+            <input name="imageFile" type="file" accept="image/*" class="hidden" onchange="previewImage(this, 'addImagePreview', 'addUploadText', 'addUploadHint')">
           </label>
         </div>
       </div>
@@ -316,83 +359,96 @@
 </div>
 
 <script>
-let currentCategory = '';
+  const ctxPath = '${pageContext.request.contextPath}';
+  let currentCategory = '';
 
-// Category nav logic
-const categoryBtns = document.querySelectorAll('#categoryNav button');
-categoryBtns.forEach(btn => {
-  btn.addEventListener('click', () => {
-    categoryBtns.forEach(b => {
-      b.className = "w-full text-left px-4 py-2.5 rounded-lg text-[13px] font-semibold text-muted hover:bg-[#f4f5f5] hover:text-ink transition-colors";
+  // Category nav logic
+  const categoryBtns = document.querySelectorAll('#categoryNav button');
+  categoryBtns.forEach(btn => {
+    btn.addEventListener('click', () => {
+      categoryBtns.forEach(b => {
+        b.className = "w-full text-left px-4 py-2.5 rounded-lg text-[13px] font-semibold text-muted hover:bg-[#f4f5f5] hover:text-ink transition-colors";
+      });
+      btn.className = "w-full text-left px-4 py-2.5 rounded-lg text-[13px] font-bold bg-[#114b3e] text-white transition-colors";
+      currentCategory = btn.dataset.filter.toLowerCase();
+      filterMenu();
     });
-    btn.className = "w-full text-left px-4 py-2.5 rounded-lg text-[13px] font-bold bg-[#114b3e] text-white transition-colors";
-    currentCategory = btn.dataset.filter.toLowerCase();
-    filterMenu();
   });
-});
 
-function openAddModal() {
-  document.getElementById('addModal').classList.remove('hidden');
-}
+  function openAddModal() {
+    document.getElementById('addModal').classList.remove('hidden');
+  }
 
-function closeModal(id) {
-  document.getElementById(id).classList.add('hidden');
-}
+  function closeModal(id) {
+    document.getElementById(id).classList.add('hidden');
+  }
 
-function openEditModalFromButton(button) {
-  const data = button.dataset;
-  document.getElementById('editId').value = data.id || '';
-  document.getElementById('editName').value = data.name || '';
-  document.getElementById('editCategoryId').value = data.categoryId || '';
-  document.getElementById('editPrice').value = data.price || '';
-  document.getElementById('editEmoji').value = data.emoji || '';
-  document.getElementById('editDescription').value = data.description || '';
-  document.getElementById('editAvailable').checked = data.available === 'true';
+  function openEditModalFromButton(button) {
+    const data = button.dataset;
+    document.getElementById('editId').value = data.id || '';
+    document.getElementById('editName').value = data.name || '';
+    document.getElementById('editCategoryId').value = data.categoryId || '';
+    document.getElementById('editPrice').value = data.price || '';
+    document.getElementById('editEmoji').value = data.emoji || '';
+    document.getElementById('editDescription').value = data.description || '';
+    document.getElementById('editAvailable').checked = data.available === 'true';
 
-  const preview = document.getElementById('editImagePreview');
-  if (data.imageUrl) {
-    preview.src = resolveImageUrl(data.imageUrl);
+    const preview = document.getElementById('editImagePreview');
+    const editText = document.getElementById('editUploadText');
+    const editHint = document.getElementById('editUploadHint');
+    if (data.imageUrl) {
+      preview.src = resolveImageUrl(data.imageUrl);
+      preview.classList.remove('hidden');
+      editText.style.display = 'none';
+      editHint.style.display = 'none';
+    } else {
+      preview.removeAttribute('src');
+      preview.classList.add('hidden');
+      editText.style.display = '';
+      editHint.style.display = '';
+    }
+    document.getElementById('editModal').classList.remove('hidden');
+  }
+
+  function resolveImageUrl(url) {
+    if (!url) return '';
+    if (url.startsWith('http://') || url.startsWith('https://')) return url;
+    if (url.startsWith('/')) return ctxPath + url;
+    return ctxPath + '/' + url;
+  }
+
+  document.querySelectorAll('.edit-menu-btn').forEach(button => {
+    button.addEventListener('click', () => openEditModalFromButton(button));
+  });
+
+  function previewImage(input, previewId, textId, hintId) {
+    const preview = document.getElementById(previewId);
+    const textEl = textId ? document.getElementById(textId) : null;
+    const hintEl = hintId ? document.getElementById(hintId) : null;
+    const file = input.files && input.files[0];
+    if (!file) {
+      preview.classList.add('hidden');
+      preview.removeAttribute('src');
+      if (textEl) textEl.style.display = '';
+      if (hintEl) hintEl.style.display = '';
+      return;
+    }
+    preview.src = URL.createObjectURL(file);
     preview.classList.remove('hidden');
-  } else {
-    preview.removeAttribute('src');
-    preview.classList.add('hidden');
+    if (textEl) textEl.style.display = 'none';
+    if (hintEl) hintEl.style.display = 'none';
   }
-  document.getElementById('editModal').classList.remove('hidden');
-}
 
-function resolveImageUrl(url) {
-  if (!url) return '';
-  if (url.startsWith('http://') || url.startsWith('https://')) return url;
-  if (url.startsWith('${pageContext.request.contextPath}/')) return url;
-  if (url.startsWith('/')) return '${pageContext.request.contextPath}' + url;
-  return url;
-}
-
-document.querySelectorAll('.edit-menu-btn').forEach(button => {
-  button.addEventListener('click', () => openEditModalFromButton(button));
-});
-
-function previewImage(input, previewId) {
-  const preview = document.getElementById(previewId);
-  const file = input.files && input.files[0];
-  if (!file) {
-    preview.classList.add('hidden');
-    return;
+  function filterMenu() {
+    const search = document.getElementById('menuSearch').value.trim().toLowerCase();
+    document.querySelectorAll('.menu-item-row').forEach(card => {
+      const haystack = (card.dataset.search || '').toLowerCase();
+      const cat = (card.dataset.cat || '').toLowerCase();
+      const matchesSearch = !search || haystack.includes(search);
+      const matchesCategory = !currentCategory || cat === currentCategory;
+      card.style.display = matchesSearch && matchesCategory ? '' : 'none';
+    });
   }
-  preview.src = URL.createObjectURL(file);
-  preview.classList.remove('hidden');
-}
-
-function filterMenu() {
-  const search = document.getElementById('menuSearch').value.trim().toLowerCase();
-  document.querySelectorAll('.menu-item-row').forEach(card => {
-    const haystack = (card.dataset.search || '').toLowerCase();
-    const cat = (card.dataset.cat || '').toLowerCase();
-    const matchesSearch = !search || haystack.includes(search);
-    const matchesCategory = !currentCategory || cat === currentCategory;
-    card.style.display = matchesSearch && matchesCategory ? '' : 'none';
-  });
-}
 </script>
 </body>
 </html>

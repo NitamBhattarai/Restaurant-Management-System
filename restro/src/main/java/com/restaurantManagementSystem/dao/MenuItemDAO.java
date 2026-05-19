@@ -18,12 +18,13 @@ public class MenuItemDAO {
     public List<MenuItem> findAll() throws SQLException {
         List<MenuItem> list = new ArrayList<>();
         String sql = "SELECT m.*, c.name AS cat_name "
-                   + "FROM menu_items m JOIN categories c ON m.category_id = c.id "
-                   + "ORDER BY c.display_order, m.name";
+                + "FROM menu_items m JOIN categories c ON m.category_id = c.id "
+                + "ORDER BY c.display_order, m.name";
         try (Connection conn = DBConnection.getConnection();
-             PreparedStatement ps = conn.prepareStatement(sql);
-             ResultSet rs = ps.executeQuery()) {
-            while (rs.next()) list.add(mapRow(rs));
+                PreparedStatement ps = conn.prepareStatement(sql);
+                ResultSet rs = ps.executeQuery()) {
+            while (rs.next())
+                list.add(mapRow(rs));
         }
         return list;
     }
@@ -32,12 +33,13 @@ public class MenuItemDAO {
     public List<MenuItem> findAvailable() throws SQLException {
         List<MenuItem> list = new ArrayList<>();
         String sql = "SELECT m.*, c.name AS cat_name "
-                   + "FROM menu_items m JOIN categories c ON m.category_id = c.id "
-                   + "WHERE m.available = 1 ORDER BY c.display_order, m.name";
+                + "FROM menu_items m JOIN categories c ON m.category_id = c.id "
+                + "WHERE m.available = 1 ORDER BY c.display_order, m.name";
         try (Connection conn = DBConnection.getConnection();
-             PreparedStatement ps = conn.prepareStatement(sql);
-             ResultSet rs = ps.executeQuery()) {
-            while (rs.next()) list.add(mapRow(rs));
+                PreparedStatement ps = conn.prepareStatement(sql);
+                ResultSet rs = ps.executeQuery()) {
+            while (rs.next())
+                list.add(mapRow(rs));
         }
         return list;
     }
@@ -58,13 +60,14 @@ public class MenuItemDAO {
     /** Find a single item by ID. */
     public MenuItem findById(int id) throws SQLException {
         String sql = "SELECT m.*, c.name AS cat_name "
-                   + "FROM menu_items m JOIN categories c ON m.category_id = c.id "
-                   + "WHERE m.id = ?";
+                + "FROM menu_items m JOIN categories c ON m.category_id = c.id "
+                + "WHERE m.id = ?";
         try (Connection conn = DBConnection.getConnection();
-             PreparedStatement ps = conn.prepareStatement(sql)) {
+                PreparedStatement ps = conn.prepareStatement(sql)) {
             ps.setInt(1, id);
             try (ResultSet rs = ps.executeQuery()) {
-                if (rs.next()) return mapRow(rs);
+                if (rs.next())
+                    return mapRow(rs);
             }
         }
         return null;
@@ -75,9 +78,9 @@ public class MenuItemDAO {
     /** Insert a new menu item. Returns generated ID. */
     public int create(MenuItem item) throws SQLException {
         String sql = "INSERT INTO menu_items(category_id, name, description, price, emoji, image_url, available) "
-                   + "VALUES(?, ?, ?, ?, ?, ?, 1)";
+                + "VALUES(?, ?, ?, ?, ?, ?, 1)";
         try (Connection conn = DBConnection.getConnection();
-             PreparedStatement ps = conn.prepareStatement(sql, Statement.RETURN_GENERATED_KEYS)) {
+                PreparedStatement ps = conn.prepareStatement(sql, Statement.RETURN_GENERATED_KEYS)) {
             ps.setInt(1, item.getCategoryId());
             ps.setString(2, item.getName());
             ps.setString(3, item.getDescription());
@@ -86,7 +89,8 @@ public class MenuItemDAO {
             ps.setString(6, item.getImageUrl());
             ps.executeUpdate();
             try (ResultSet gk = ps.getGeneratedKeys()) {
-                if (gk.next()) return gk.getInt(1);
+                if (gk.next())
+                    return gk.getInt(1);
             }
         }
         return -1;
@@ -97,10 +101,10 @@ public class MenuItemDAO {
     /** Update an existing item's details. */
     public boolean update(MenuItem item) throws SQLException {
         String sql = "UPDATE menu_items "
-                   + "SET category_id=?, name=?, description=?, price=?, emoji=?, image_url=?, available=? "
-                   + "WHERE id=?";
+                + "SET category_id=?, name=?, description=?, price=?, emoji=?, image_url=?, available=? "
+                + "WHERE id=?";
         try (Connection conn = DBConnection.getConnection();
-             PreparedStatement ps = conn.prepareStatement(sql)) {
+                PreparedStatement ps = conn.prepareStatement(sql)) {
             ps.setInt(1, item.getCategoryId());
             ps.setString(2, item.getName());
             ps.setString(3, item.getDescription());
@@ -119,7 +123,7 @@ public class MenuItemDAO {
     public boolean delete(int id) throws SQLException {
         String sql = "DELETE FROM menu_items WHERE id = ?";
         try (Connection conn = DBConnection.getConnection();
-             PreparedStatement ps = conn.prepareStatement(sql)) {
+                PreparedStatement ps = conn.prepareStatement(sql)) {
             ps.setInt(1, id);
             return ps.executeUpdate() > 0;
         }
@@ -136,9 +140,31 @@ public class MenuItemDAO {
         m.setDescription(rs.getString("description"));
         m.setPrice(rs.getBigDecimal("price"));
         m.setEmoji(rs.getString("emoji"));
-        m.setImageUrl(rs.getString("image_url"));
+        m.setImageUrl(defaultImageUrl(rs.getString("image_url"), m.getCategoryId()));
         m.setAvailable(rs.getBoolean("available"));
         return m;
     }
-}
 
+    private String defaultImageUrl(String imageUrl, int categoryId) {
+        if (imageUrl != null && !imageUrl.isBlank()) {
+            imageUrl = imageUrl.trim();
+            // Migrate old-style upload paths to the ImageServlet URL
+            if (imageUrl.startsWith("/uploads/menu/")) {
+                String fileName = imageUrl.substring("/uploads/menu/".length());
+                return "/menu-image?file=" + fileName;
+            }
+            if (imageUrl.startsWith("uploads/menu/")) {
+                String fileName = imageUrl.substring("uploads/menu/".length());
+                return "/menu-image?file=" + fileName;
+            }
+            return imageUrl;
+        }
+        return switch (categoryId) {
+            case 1 -> "/assets/images/hero-food.png";
+            case 2 -> "/assets/images/restaurant-ambience.png";
+            case 3 -> "/assets/images/feedback-dining.png";
+            case 4 -> "/assets/images/lamb_rack.png";
+            default -> "/assets/images/hero-food.png";
+        };
+    }
+}

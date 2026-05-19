@@ -67,6 +67,25 @@ public class FeedbackDAO {
         return (double) total / feedback.size();
     }
 
+    public boolean toggleFlag(int feedbackId) throws SQLException {
+        String sql = "UPDATE guest_feedback SET flagged = NOT flagged WHERE id = ?";
+        try (Connection conn = DBConnection.getConnection();
+             PreparedStatement ps = conn.prepareStatement(sql)) {
+            ps.setInt(1, feedbackId);
+            return ps.executeUpdate() > 0;
+        }
+    }
+
+    public boolean updateInternalNote(int feedbackId, String note) throws SQLException {
+        String sql = "UPDATE guest_feedback SET internal_note = ? WHERE id = ?";
+        try (Connection conn = DBConnection.getConnection();
+             PreparedStatement ps = conn.prepareStatement(sql)) {
+            ps.setString(1, note);
+            ps.setInt(2, feedbackId);
+            return ps.executeUpdate() > 0;
+        }
+    }
+
     private Feedback mapRow(ResultSet rs) throws SQLException {
         Feedback feedback = new Feedback();
         feedback.setId(rs.getInt("id"));

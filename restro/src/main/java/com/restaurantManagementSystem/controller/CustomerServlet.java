@@ -9,12 +9,14 @@ import com.restaurantManagementSystem.dao.TableDAO;
 import com.restaurantManagementSystem.model.Bill;
 import com.restaurantManagementSystem.model.DiningTable;
 import com.restaurantManagementSystem.model.Feedback;
+import com.restaurantManagementSystem.model.MenuItem;
 import com.restaurantManagementSystem.model.Order;
 import com.restaurantManagementSystem.model.OrderItem;
 import com.restaurantManagementSystem.model.Reservation;
 import com.restaurantManagementSystem.model.User;
 
 import jakarta.servlet.ServletException;
+import java.util.Map;
 import jakarta.servlet.http.HttpServlet;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
@@ -58,7 +60,9 @@ public class CustomerServlet extends HttpServlet {
                         }
                         req.setAttribute("table", table);
                     }
-                    req.setAttribute("menuByCategory", menuDAO.findGroupedByCategory());
+                    Map<String, List<MenuItem>> groupedMenu = menuDAO.findGroupedByCategory();
+                    req.setAttribute("menuByCategory", groupedMenu);
+                    req.setAttribute("categoryEntries", new ArrayList<>(groupedMenu.entrySet()));
                     forward(req, resp, "/pages/customer/menu.jsp");
                     break;
                 }
@@ -323,8 +327,7 @@ public class CustomerServlet extends HttpServlet {
 
         feedbackDAO.create(feedback);
 
-        req.setAttribute("success", "Thank you! Your feedback has been recorded.");
-        forward(req, resp, "/pages/customer/feedback.jsp");
+        resp.sendRedirect(req.getContextPath() + "/");
     }
 
     private int parseRating(String value) {

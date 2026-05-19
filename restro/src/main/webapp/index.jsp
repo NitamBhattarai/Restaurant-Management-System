@@ -2,6 +2,11 @@
 uri="jakarta.tags.core" %>
 <c:set var="pageTitle" value="Home - Gokyo Bistro" />
 <%@ include file="/pages/errorpages/header.jsp" %>
+<c:set var="heroFoodImg" value="https://images.unsplash.com/photo-1517248135467-4c7edcad34c4?w=1200&auto=format&fit=crop" />
+<c:set var="restaurantAmbienceImg" value="https://images.unsplash.com/photo-1528605248644-14dd04022da1?w=1200&auto=format&fit=crop" />
+<c:set var="feedbackDiningImg" value="https://images.unsplash.com/photo-1504674900247-0877df9cc836?w=1200&auto=format&fit=crop" />
+<c:set var="lambRackImg" value="https://images.unsplash.com/photo-1604908176831-926c9bdc25bc?w=1200&auto=format&fit=crop" />
+<c:set var="riverCrabImg" value="https://images.unsplash.com/photo-1543353071-873f17a7a088?w=1200&auto=format&fit=crop" />
 
 <style>
   body {
@@ -72,57 +77,34 @@ uri="jakarta.tags.core" %>
     min-height: 76vh;
     overflow: hidden;
     background:
-      radial-gradient(
-        circle at 74% 28%,
-        rgba(45, 120, 90, 0.18),
-        transparent 22%
-      ),
-      radial-gradient(
-        circle at 76% 22%,
-        rgba(188, 223, 206, 0.08),
-        transparent 42%
-      ),
-      linear-gradient(180deg, rgba(3, 48, 37, 0.88), rgba(2, 49, 38, 0.94)),
+      linear-gradient(180deg, rgba(3, 48, 37, 0.72), rgba(2, 49, 38, 0.82)),
       #032e24;
     border-radius: 0;
     width: 100%;
   }
 
+  .hero-bg-img {
+    position: absolute;
+    inset: 0;
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+    object-position: center;
+    z-index: 0;
+    opacity: 0.55;
+  }
+
   .hero::after {
     content: "";
     position: absolute;
-    right: -40px;
-    top: -18px;
-    width: 620px;
-    height: 620px;
-    border-radius: 50%;
-    background: radial-gradient(
-      circle at 48% 48%,
-      rgba(20, 59, 47, 0.2) 0 34%,
-      rgba(8, 37, 29, 0.45) 34% 43%,
-      rgba(5, 29, 23, 0.86) 43% 58%,
-      rgba(3, 23, 18, 0.96) 58% 67%,
-      transparent 67%
-    );
-    opacity: 0.82;
-  }
-
-  .hero::before {
-    content: "";
-    position: absolute;
-    right: 118px;
-    top: 132px;
-    width: 176px;
-    height: 104px;
-    border-radius: 0 0 90px 90px;
+    inset: 0;
     background: linear-gradient(
-      160deg,
-      rgba(193, 150, 120, 0.95),
-      rgba(117, 72, 52, 0.96)
+      to right,
+      rgba(2, 49, 38, 0.88) 45%,
+      rgba(2, 49, 38, 0.3) 100%
     );
-    box-shadow: 0 22px 28px rgba(0, 0, 0, 0.18);
-    transform: rotate(-21deg);
-    opacity: 0.92;
+    z-index: 1;
+    pointer-events: none;
   }
 
   .hero-copy {
@@ -215,15 +197,17 @@ uri="jakarta.tags.core" %>
   .story-visual {
     position: relative;
     height: 460px;
-    background:
-      linear-gradient(180deg, rgba(0, 0, 0, 0.2), rgba(0, 0, 0, 0.28)),
-      radial-gradient(
-        circle at 50% 24%,
-        rgba(211, 160, 121, 0.34),
-        transparent 28%
-      ),
-      linear-gradient(145deg, #5e3d2b, #171210);
     overflow: hidden;
+    background: #171210;
+  }
+
+  .story-visual img {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+    object-position: center;
+    display: block;
+    opacity: 0.85;
   }
 
   .story-plate {
@@ -233,24 +217,7 @@ uri="jakarta.tags.core" %>
     width: 230px;
     height: 230px;
     border-radius: 50%;
-    background: radial-gradient(
-      circle at 50% 48%,
-      rgba(255, 255, 255, 0.98),
-      rgba(229, 223, 216, 0.9) 56%,
-      rgba(164, 155, 146, 0.64) 78%,
-      rgba(93, 84, 76, 0.4) 100%
-    );
-    box-shadow: 0 22px 30px rgba(0, 0, 0, 0.18);
-  }
-
-  .story-plate::after {
-    content: "🍽";
-    position: absolute;
-    inset: 0;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    font-size: 86px;
+    background-image: url("${restaurantAmbienceImg}");
   }
 
   .story-badge {
@@ -325,30 +292,24 @@ uri="jakarta.tags.core" %>
 
   .curator-left {
     min-height: 620px;
-    background:
-      radial-gradient(
-        circle at 46% 44%,
-        rgba(160, 175, 176, 0.8),
-        rgba(34, 48, 52, 0.96) 58%,
-        rgba(13, 24, 27, 1) 76%
-      ),
-      linear-gradient(160deg, #222f34, #101718);
+    background: #101718;
+  }
+
+  .curator-left > img,
+  .curator-right-top > img {
+    position: absolute;
+    inset: 0;
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+    object-position: center;
+    opacity: 0.72;
   }
 
   .curator-left::after,
   .curator-right-top::after,
   .curator-small::after {
-    position: absolute;
-    color: rgba(255, 255, 255, 0.94);
-    text-shadow: 0 8px 14px rgba(0, 0, 0, 0.22);
-  }
-
-  .curator-left::after {
-    content: "🥩";
-    font-size: 180px;
-    left: 50%;
-    top: 50%;
-    transform: translate(-50%, -50%);
+    display: none;
   }
 
   .curator-caption {
@@ -380,20 +341,7 @@ uri="jakarta.tags.core" %>
 
   .curator-right-top {
     min-height: 300px;
-    background:
-      radial-gradient(
-        circle at 58% 40%,
-        rgba(210, 214, 209, 0.54),
-        transparent 24%
-      ),
-      linear-gradient(180deg, #201a17, #0d1012);
-  }
-
-  .curator-right-top::after {
-    content: "🦀";
-    font-size: 138px;
-    right: 38px;
-    top: 42px;
+    background: #0d1012;
   }
 
   .curator-right-bottom {
@@ -435,10 +383,28 @@ uri="jakarta.tags.core" %>
   }
 
   .newsletter-section {
+    position: relative;
     background: #063828;
     padding: 74px 34px 66px;
     text-align: center;
     color: #edf4ef;
+    overflow: hidden;
+  }
+
+  .newsletter-section > img.newsletter-bg {
+    position: absolute;
+    inset: 0;
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+    object-position: center 40%;
+    opacity: 0.18;
+    z-index: 0;
+  }
+
+  .newsletter-section > *:not(.newsletter-bg) {
+    position: relative;
+    z-index: 1;
   }
 
   .newsletter-mark {
@@ -645,6 +611,13 @@ uri="jakarta.tags.core" %>
   </header>
 
   <section class="hero">
+    <img
+      src="${heroFoodImg}"
+      alt="Gokyo Bistro signature dishes"
+      class="hero-bg-img"
+      loading="eager"
+      onerror="this.onerror=null;this.src='${restaurantAmbienceImg}';"
+    />
     <div class="hero-copy">
       <p class="eyebrow">Established in the Himalayas</p>
       <h1>Plated<br />Perfection</h1>
@@ -670,6 +643,12 @@ uri="jakarta.tags.core" %>
   <section class="story-section" id="philosophy">
     <div class="story-grid">
       <div class="story-visual">
+        <img
+          src="${restaurantAmbienceImg}"
+          alt="Gokyo Bistro dining ambience"
+          loading="eager"
+          onerror="this.onerror=null;this.src='${heroFoodImg}';"
+        />
         <div class="story-plate"></div>
         <div class="story-badge">The Gokyo Standard</div>
       </div>
@@ -699,6 +678,12 @@ uri="jakarta.tags.core" %>
     <h2 class="curator-heading">The Curator's Selection</h2>
     <div class="curator-grid">
       <article class="curator-left">
+        <img
+          src="${lambRackImg}"
+          alt="Highland Lamb Rack"
+          loading="eager"
+          onerror="this.onerror=null;this.src='${heroFoodImg}';"
+        />
         <div class="curator-caption">
           <h3>Highland Lamb Rack</h3>
           <div class="price-chip">Rs 4,200</div>
@@ -706,6 +691,12 @@ uri="jakarta.tags.core" %>
       </article>
       <div class="curator-stack">
         <article class="curator-right-top">
+          <img
+            src="${riverCrabImg}"
+            alt="River Crab Infusion"
+            loading="eager"
+            onerror="this.onerror=null;this.src='${heroFoodImg}';"
+          />
           <div class="curator-caption">
             <h3 style="font-size: 24px">River Crab Infusion</h3>
             <div class="price-chip">Rs 3,300</div>
@@ -730,6 +721,13 @@ uri="jakarta.tags.core" %>
   </section>
 
   <section class="newsletter-section">
+    <img
+      src="${feedbackDiningImg}"
+      alt="Restaurant dining table"
+      class="newsletter-bg"
+      loading="eager"
+      onerror="this.onerror=null;this.src='${restaurantAmbienceImg}';"
+    />
     <div class="newsletter-mark">✦</div>
     <h2 class="newsletter-title">Join the Inner Circle</h2>
     <p class="newsletter-copy">

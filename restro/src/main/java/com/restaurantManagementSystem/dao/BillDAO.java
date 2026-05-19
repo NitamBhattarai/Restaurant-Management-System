@@ -47,6 +47,52 @@ public class BillDAO {
         return null;
     }
 
+    /** Create a bill for an order when older data does not already have one. */
+    public Bill createForOrderIfMissing(int orderId) throws SQLException {
+        Bill existing = findByOrderId(orderId);
+        if (existing != null) {
+            return existing;
+        }
+
+        BigDecimal subtotal = BigDecimal.ZERO;
+        String sumSql = "SELECT COALESCE(SUM(quantity * unit_price), 0) FROM order_items WHERE order_id = ?";
+        try (Connection conn = DBConnection.getConnection();
+             PreparedStatement ps = conn.prepareStatement(sumSql)) {
+            ps.setInt(1, orderId);
+            try (ResultSet rs = ps.executeQuery()) {
+                if (rs.next()) {
+                    subtotal = rs.getBigDecimal(1);
+                }
+            }
+        }
+
+        BigDecimal vatRate = new BigDecimal("13.00");
+        BigDecimal serviceRate = new BigDecimal("10.00");
+        BigDecimal vatAmt = subtotal.multiply(vatRate)
+                .divide(BigDecimal.valueOf(100), 2, RoundingMode.HALF_UP);
+        BigDecimal svcAmt = subtotal.multiply(serviceRate)
+                .divide(BigDecimal.valueOf(100), 2, RoundingMode.HALF_UP);
+        BigDecimal total = subtotal.add(vatAmt).add(svcAmt);
+
+        String insertSql = "INSERT INTO bills(order_id, subtotal, vat_rate, vat_amount, "
+                + "service_rate, service_amount, total) VALUES(?,?,?,?,?,?,?)";
+        try (Connection conn = DBConnection.getConnection();
+             PreparedStatement ps = conn.prepareStatement(insertSql)) {
+            ps.setInt(1, orderId);
+            ps.setBigDecimal(2, subtotal);
+            ps.setBigDecimal(3, vatRate);
+            ps.setBigDecimal(4, vatAmt);
+            ps.setBigDecimal(5, serviceRate);
+            ps.setBigDecimal(6, svcAmt);
+            ps.setBigDecimal(7, total);
+            ps.executeUpdate();
+        } catch (SQLIntegrityConstraintViolationException ignored) {
+            // Another request created the bill first; load it below.
+        }
+
+        return findByOrderId(orderId);
+    }
+
     /**
      * Apply a percentage discount to a bill and recalculate totals.
      * Recalculates VAT and service charge on the discounted subtotal.

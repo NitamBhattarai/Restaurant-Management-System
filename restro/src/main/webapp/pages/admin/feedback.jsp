@@ -69,7 +69,7 @@
     </div>
     <div class="flex items-center gap-4">
       <button class="w-8 h-8 flex items-center justify-center text-muted hover:text-ink transition-colors">🔔</button>
-      <button class="w-8 h-8 flex items-center justify-center text-muted hover:text-ink transition-colors">⚙️</button>
+      <a href="${pageContext.request.contextPath}/admin/settings" class="w-8 h-8 flex items-center justify-center text-muted hover:text-ink transition-colors">⚙️</a>
     </div>
   </div>
 
@@ -199,17 +199,43 @@
 
                   <p class="text-[13px] italic text-[#4b4742] mb-5 leading-relaxed">"<c:out value="${fb.comments}"/>"</p>
 
+                  <c:if test="${not empty fb.internalNote}">
+                    <div class="bg-[#fffbeb] border border-[#fde68a] rounded-lg p-3 mb-4 text-[12px] text-[#92400e]">
+                      <span class="font-bold">📝 Internal Note:</span> <c:out value="${fb.internalNote}"/>
+                    </div>
+                  </c:if>
+
                   <div class="flex items-center justify-between">
                     <div class="flex gap-2">
-                      <button class="bg-[#114b3e] text-white px-4 py-1.5 rounded text-[12px] font-bold hover:bg-[#0e3b31] transition-colors">Respond</button>
-                      <button class="bg-[#f4f5f5] text-ink px-4 py-1.5 rounded text-[12px] font-bold hover:bg-[#eef0f0] transition-colors border border-black/5">Internal Note</button>
+                      <button type="button" onclick="toggleNoteForm(${fb.id})" class="bg-[#f4f5f5] text-ink px-4 py-1.5 rounded text-[12px] font-bold hover:bg-[#eef0f0] transition-colors border border-black/5">Internal Note</button>
                     </div>
                     <div class="flex items-center gap-3">
                       <c:if test="${fb.overallRating <= 3}">
                         <span class="text-[9px] uppercase tracking-widest font-bold text-[#b45309] bg-[#fef3c7] px-2 py-1 rounded">Needs Attention</span>
                       </c:if>
-                      <button class="text-muted hover:text-ink transition-colors text-sm">⚑ FLAG</button>
+                      <c:if test="${fb.flagged}">
+                        <span class="text-[9px] uppercase tracking-widest font-bold text-[#dc2626] bg-[#fef2f2] px-2 py-1 rounded">Flagged</span>
+                      </c:if>
+                      <form method="POST" action="${pageContext.request.contextPath}/admin/feedback" style="display:inline">
+                        <input type="hidden" name="action" value="flag"/>
+                        <input type="hidden" name="id" value="${fb.id}"/>
+                        <button type="submit" class="text-muted hover:text-ink transition-colors text-sm" title="${fb.flagged ? 'Unflag' : 'Flag'}">
+                          ${fb.flagged ? '⚑ UNFLAG' : '⚑ FLAG'}
+                        </button>
+                      </form>
                     </div>
+                  </div>
+
+                  <%-- Collapsible Internal Note Form --%>
+                  <div id="noteForm-${fb.id}" class="hidden mt-4 border-t border-black/5 pt-4">
+                    <form method="POST" action="${pageContext.request.contextPath}/admin/feedback" class="flex gap-2">
+                      <input type="hidden" name="action" value="note"/>
+                      <input type="hidden" name="id" value="${fb.id}"/>
+                      <input type="text" name="internalNote" placeholder="Add an internal note..."
+                             value="<c:out value='${fb.internalNote}'/>"
+                             class="flex-1 px-3 py-2 rounded border border-black/10 text-[12px] outline-none focus:ring-1 focus:ring-[#114b3e]/20"/>
+                      <button type="submit" class="bg-[#114b3e] text-white px-4 py-2 rounded text-[12px] font-bold hover:bg-[#0e3b31] transition-colors">Save</button>
+                    </form>
                   </div>
                 </article>
               </c:forEach>
@@ -349,6 +375,16 @@
       const matchesFilter = active === 'all' || (item.dataset.sentiment || '').includes(active);
       item.style.display = matchesSearch && matchesFilter ? '' : 'none';
     });
+  }
+
+  function toggleNoteForm(feedbackId) {
+    const form = document.getElementById('noteForm-' + feedbackId);
+    if (form) {
+      form.classList.toggle('hidden');
+      if (!form.classList.contains('hidden')) {
+        form.querySelector('input[name="internalNote"]').focus();
+      }
+    }
   }
 </script>
 </body>

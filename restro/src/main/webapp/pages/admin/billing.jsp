@@ -1,6 +1,7 @@
 <%@ page contentType="text/html;charset=UTF-8" import="com.restaurantManagementSystem.model.*" %>
 <%@ taglib prefix="c" uri="jakarta.tags.core" %>
 <%@ taglib prefix="fmt" uri="jakarta.tags.fmt" %>
+<%@ taglib prefix="fn" uri="jakarta.tags.functions" %>
 <c:set var="pageTitle" value="Billing"/>
 <%@ include file="/pages/errorpages/header.jsp" %>
 <%@ include file="/pages/errorpages/admin-sidebar.jsp" %>
@@ -23,18 +24,20 @@
             <th class="px-4 py-2.5 text-left text-[10px] uppercase tracking-widest font-semibold text-muted">Order</th>
             <th class="px-4 py-2.5 text-left text-[10px] uppercase tracking-widest font-semibold text-muted">Table</th>
             <th class="px-4 py-2.5 text-left text-[10px] uppercase tracking-widest font-semibold text-muted">Status</th>
+            <th class="px-4 py-2.5 text-left text-[10px] uppercase tracking-widest font-semibold text-muted">Items</th>
             <th class="px-4 py-2.5 text-left text-[10px] uppercase tracking-widest font-semibold text-muted">Action</th>
           </tr>
           </thead>
           <tbody>
           <c:forEach items="${orders}" var="o">
             <c:if test="${o.status.name() != 'CANCELLED'}">
-              <tr data-table="${o.tableNumber}" class="border-b border-black/5 hover:bg-paper transition-colors">
-                <td class="px-4 py-3 font-mono text-[11px] text-muted">${o.orderCode}</td>
+                <tr id="order-row-${o.id}" data-table="${o.tableNumber}" data-order-code="${o.orderCode}" data-bill-id="${billMap[o.id]}" class="border-b border-black/5 hover:bg-paper transition-colors">
+                  <td class="px-4 py-3 font-mono text-[11px] text-muted">${o.orderCode}</td>
                 <td class="px-4 py-3 font-semibold text-ink">${o.tableNumber}</td>
                 <td class="px-4 py-3"><span class="badge badge-${o.status.name().toLowerCase()}">${o.status}</span></td>
+                <td class="px-4 py-3 text-[11px] text-muted">${o.items.size()} item<c:if test="${o.items.size() != 1}">s</c:if></td>
                 <td class="px-4 py-3">
-                  <button onclick="loadBill(${o.id}, '${o.orderCode}', '${o.tableNumber}')"
+                      <button onclick="loadBill(<c:out value='${o.id}'/>)"
                           class="text-xs bg-forest text-white px-3 py-1.5 rounded hover:bg-forest-md transition-colors">
                     Generate Bill
                   </button>
@@ -44,6 +47,19 @@
           </c:forEach>
           </tbody>
         </table>
+      <!-- Hidden per-order item lists rendered by JSP (used by JS) -->
+      <div id="orderItemsHidden" class="hidden">
+        <c:forEach items="${orders}" var="o">
+          <div id="order-items-${o.id}">
+            <c:forEach items="${o.items}" var="i">
+              <div class="order-item"
+                   data-name="${fn:escapeXml(i.menuItemName)}"
+                   data-qty="${i.quantity}"
+                   data-price="${i.lineTotal}"></div>
+            </c:forEach>
+          </div>
+        </c:forEach>
+      </div>
       </div>
     </div>
 
@@ -134,47 +150,68 @@
 
   </div>
 </div>
-</div>
 
 <script>
-  const orderItemsData = {};
-  <c:forEach items="${orders}" var="o">
-    orderItemsData[${o.id}] = [
-      <c:forEach items="${o.items}" var="i">
-        { name: '<c:out value="${i.menuItemName}"/>', qty: ${i.quantity}, price: ${i.lineTotal} },
-      </c:forEach>
-    ];
-  </c:forEach>
-
-  const orderBillData = {
-    <c:forEach items="${billMap}" var="entry">
-      ${entry.key}: ${entry.value},
-    </c:forEach>
-  };
-
+  const selectedBillingOrderIdRaw = '<c:out value="${selectedBillingOrderId}"/>';
+  const selectedBillingOrderId = selectedBillingOrderIdRaw && selectedBillingOrderIdRaw !== 'null'
+      ? Number(selectedBillingOrderIdRaw)
+      : null;
   let currentOrderId = null;
   let currentBillId  = null;
   let subtotal = 0, vatAmt = 0, svcAmt = 0;
 
-  function loadBill(orderId, code, tableNum) {
+  function loadBill(orderId) {
     currentOrderId = orderId;
-    currentBillId = orderBillData[orderId];
+    const row = document.getElementById('order-row-' + orderId);
+    const code = row ? row.dataset.orderCode : '';
+    const tableNum = row ? row.dataset.table : '';
+    currentBillId = row ? row.dataset.billId : null;
     document.getElementById('billDetailCard').classList.remove('hidden');
     document.getElementById('billCardTitle').textContent = 'Bill — ' + code + ' · ' + tableNum;
-    
-    const items = orderItemsData[orderId] || [];
-    subtotal = items.reduce((a,i)=>a+i.price,0);
-    document.getElementById('billItemsBody').innerHTML = items.map(i=>
-            `<tr class="border-b border-black/5">
-       <td class="px-6 py-3">${i.name}</td>
-       <td class="px-6 py-3 text-right text-muted">×${i.qty}</td>
-       <td class="px-6 py-3 text-right font-medium">Rs ${i.price.toLocaleString()}.00</td>
-     </tr>`
-    ).join('');
+
+    // Read items rendered into hidden DOM by JSP
+    const container = document.getElementById('order-items-' + orderId);
+    if (!container) {
+      document.getElementById('billItemsBody').innerHTML = '<tr><td colspan="3" class="px-6 py-8 text-center text-sm text-red-600">No items found for this order</td></tr>';
+      subtotal = 0;
+      recalc();
+      return;
+    }
+    const nodes = Array.from(container.querySelectorAll('.order-item'));
+    const items = nodes.map(n => ({
+      name: (n.dataset.name || 'Item').trim(),
+      qty: parseInt(n.dataset.qty, 10) || 0,
+      price: parseFloat(n.dataset.price) || 0
+    }));
+    subtotal = items.reduce((a,i)=>a+(parseFloat(i.price)||0),0);
+    if (items.length === 0) {
+      document.getElementById('billItemsBody').innerHTML = '<tr><td colspan="3" class="px-6 py-8 text-center text-sm text-red-600">No items found for this order</td></tr>';
+    } else {
+      document.getElementById('billItemsBody').innerHTML = items.map(i=>{
+        const itemName = i.name || '(no name)';
+        const qty = i.qty || 0;
+        const price = i.price || 0;
+        return '<tr class="border-b border-black/5">'
+          + '<td class="px-6 py-3">' + escapeHtml(itemName) + '</td>'
+          + '<td class="px-6 py-3 text-right text-muted">x' + qty + '</td>'
+          + '<td class="px-6 py-3 text-right font-medium">Rs ' + Number(price).toLocaleString() + '</td>'
+          + '</tr>';
+      }).join('');
+    }
     recalc();
     document.getElementById('processBtn').disabled = false;
     document.getElementById('processBtn').classList.remove('opacity-50','cursor-not-allowed');
     document.getElementById('billDetailCard').scrollIntoView({behavior:'smooth', block:'start'});
+  }
+
+  function escapeHtml(value) {
+    return String(value).replace(/[&<>"']/g, ch => ({
+      '&': '&amp;',
+      '<': '&lt;',
+      '>': '&gt;',
+      '"': '&quot;',
+      "'": '&#39;'
+    }[ch]));
   }
 
   function recalc() {
@@ -248,10 +285,19 @@
   function applyInitialBillingQuery() {
     const params = new URLSearchParams(window.location.search);
     const table = params.get('table');
-    if (!table) return;
-    const targetRow = document.querySelector(`#billingOrdersTable tbody tr[data-table="${table}"] button`);
-    if (targetRow) {
-      targetRow.click();
+    let targetRow = null;
+    if (table) {
+      targetRow = document.querySelector('#billingOrdersTable tbody tr[data-table="' + CSS.escape(table) + '"] button');
+      if (targetRow) {
+        targetRow.click();
+        return;
+      }
+    }
+    if (selectedBillingOrderId !== null) {
+      targetRow = document.querySelector('#billingOrdersTable tbody tr#order-row-' + selectedBillingOrderId + ' button');
+      if (targetRow) {
+        targetRow.click();
+      }
     }
   }
 
@@ -259,5 +305,3 @@
 </script>
 </body>
 </html>
-
-

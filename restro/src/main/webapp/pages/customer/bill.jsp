@@ -88,6 +88,15 @@
           </div>
         </div>
       </div>
+
+      <c:if test="${not empty order}">
+        <a href="${pageContext.request.contextPath}/customer/feedback?table=${table.tableNumber}"
+           class="mt-6 w-full max-w-md bg-forest text-white rounded-2xl px-6 py-4 text-sm font-semibold hover:bg-forest-md transition-all flex items-center justify-center gap-3 shadow-lg shadow-[#114b3e]/15 group">
+          <span class="text-xl group-hover:scale-110 transition-transform">💬</span>
+          <span>Share Your Experience</span>
+        </a>
+        <p class="text-[11px] text-muted mt-2 max-w-md text-center">Your feedback helps us serve you better</p>
+      </c:if>
     </div>
   </div>
 

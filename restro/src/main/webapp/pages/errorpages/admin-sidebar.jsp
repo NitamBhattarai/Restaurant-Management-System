@@ -5,6 +5,7 @@
 %>
 
 <aside class="w-48 bg-white border-r border-black/10 fixed top-0 bottom-0 left-0 z-30 flex flex-col overflow-y-auto">
+  <c:url value="/admin/reports" var="reportsUrl" />
   <div class="px-4 py-5 border-b border-black/10">
     <a href="<%=cp%>/admin/dashboard" class="flex items-center gap-3">
       <div class="w-9 h-9 rounded-md bg-ink flex items-center justify-center">
@@ -23,8 +24,18 @@
       <span class="text-sm">H</span>
       <span>Dashboard</span>
     </a>
-    <a href="<%=cp%>/admin/reports"
-       class="flex items-center gap-3 px-5 py-3 text-[15px] font-medium text-ink2 border-r-[3px] <%=path.equals("/admin/reports") ? "bg-[#eef8f4] border-forest text-forest" : "border-transparent hover:bg-paper2"%>">
+      <a href="<%=cp%>/admin/users"
+       class="flex items-center gap-3 px-5 py-3 text-[15px] font-medium text-ink2 border-r-[3px] <%=path.equals("/admin/users") ? "bg-[#eef8f4] border-forest text-forest" : "border-transparent hover:bg-paper2"%>">
+      <span class="text-sm">U</span>
+      <span>Users</span>
+    </a>
+      <a href="<%=cp%>/admin/tables"
+       class="flex items-center gap-3 px-5 py-3 text-[15px] font-medium text-ink2 border-r-[3px] <%=path.equals("/admin/tables") ? "bg-[#eef8f4] border-forest text-forest" : "border-transparent hover:bg-paper2"%>">
+      <span class="text-sm">T</span>
+      <span>Tables</span>
+    </a>
+    <a href="${reportsUrl}"
+       class="flex items-center gap-3 px-5 py-3 text-[15px] font-medium text-ink2 border-r-[3px] <%=path.equals("/admin/reports") || path.equals("/admin/reports/") ? "bg-[#eef8f4] border-forest text-forest" : "border-transparent hover:bg-paper2"%>">
       <span class="text-sm">R</span>
       <span>Reports</span>
     </a>

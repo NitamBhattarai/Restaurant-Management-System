@@ -182,6 +182,16 @@ INSERT INTO menu_items (category_id, name, description, price, emoji) VALUES
 (4,'Seasonal Tart','Chef''s daily creation — ask your server for today''s selection',220.00,'🧁');
 
 -- Sample reservations
+UPDATE menu_items
+SET image_url = CASE category_id
+    WHEN 1 THEN '/assets/images/menu/starters.svg'
+    WHEN 2 THEN '/assets/images/menu/mains.svg'
+    WHEN 3 THEN '/assets/images/menu/drinks.svg'
+    WHEN 4 THEN '/assets/images/menu/desserts.svg'
+    ELSE image_url
+END
+WHERE image_url IS NULL OR image_url = '';
+
 INSERT INTO reservations (table_id, party_size, reserved_at, status) VALUES
 (6,4, DATE_ADD(NOW(), INTERVAL 3 HOUR), 'CONFIRMED'),
 (12,2, DATE_ADD(NOW(), INTERVAL 4 HOUR), 'PENDING');

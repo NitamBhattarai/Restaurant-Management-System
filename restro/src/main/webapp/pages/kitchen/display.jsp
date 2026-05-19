@@ -53,7 +53,7 @@
 </div>
 
 <!-- ORDER TICKETS BOARD -->
-<div class="p-6 grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-4 min-h-screen bg-paper2" id="board">
+<div class="p-5 grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 2xl:grid-cols-5 gap-3 min-h-screen bg-paper2" id="board">
 
   <c:choose>
     <c:when test="${empty orders}">
@@ -84,7 +84,7 @@
           <div class="h-[3px] w-full" style="background:${stripeColor}"></div>
 
           <!-- Ticket header -->
-          <div class="px-4 py-3 border-b border-black/8 flex items-start justify-between">
+          <div class="px-3 py-2 border-b border-black/8 flex items-start justify-between">
             <div>
               <div class="font-serif text-2xl font-medium text-ink
                           ${o.status.name() == 'READY' ? 'text-green-700' : ''}">
@@ -103,7 +103,7 @@
           </div>
 
           <!-- Items list -->
-          <div class="px-4 py-3 flex-1">
+          <div class="px-3 py-2 flex-1">
             <c:forEach items="${o.items}" var="item">
               <div class="flex items-start justify-between py-1.5 border-b border-black/5 last:border-0">
                 <div>
@@ -121,7 +121,7 @@
           </div>
 
           <!-- Action buttons -->
-          <div class="px-4 py-3 border-t border-black/8 flex gap-2">
+          <div class="px-3 py-2 border-t border-black/8 flex gap-2">
             <c:choose>
               <c:when test="${o.status.name() == 'PENDING'}">
                 <button onclick="updateStatus(${o.id}, 'PREPARING', this)"
@@ -137,6 +137,19 @@
                                bg-forest/8 border border-forest/20 text-forest
                                hover:bg-forest hover:text-white hover:border-forest transition-all">
                   Mark Ready
+                </button>
+              </c:when>
+              <c:when test="${o.status.name() == 'READY'}">
+                <button onclick="updateStatus(${o.id}, 'SERVED', this)"
+                        class="flex-1 py-2 text-xs font-medium rounded
+                               bg-blue-50 border border-blue-300 text-blue-800
+                               hover:bg-blue-500 hover:text-white hover:border-blue-500 transition-all">
+                  Mark Served
+                </button>
+              </c:when>
+              <c:when test="${o.status.name() == 'SERVED'}">
+                <button class="flex-1 py-2 text-xs font-medium rounded bg-paper border border-black/10 text-muted cursor-default">
+                  ✓ Served
                 </button>
               </c:when>
               <c:otherwise>
@@ -188,9 +201,16 @@ function updateStatus(orderId, newStatus, btn) {
 function updateTicketVisuals(ticket, status) {
   const stripes = {PENDING:'#e8b44a', PREPARING:'#e8734a', READY:'#3aad6a', SERVED:'#4a80d0'};
   ticket.querySelector('.h-\\[3px\\]').style.background = stripes[status] || '#e8b44a';
-  const actionDiv = ticket.querySelector('.px-4.py-3.border-t');
+  const actionDiv = ticket.querySelector('.border-t');
+  const orderId = ticket.dataset.id;
   if (status === 'READY') {
-    actionDiv.innerHTML = `<button class="flex-1 py-2 text-xs font-medium rounded bg-paper border border-black/10 text-muted cursor-default">✓ Ready to Serve</button>`;
+    actionDiv.innerHTML = `<button onclick="updateStatus(${orderId}, 'SERVED', this)" class="flex-1 py-2 text-xs font-medium rounded bg-blue-50 border border-blue-300 text-blue-800 hover:bg-blue-500 hover:text-white hover:border-blue-500 transition-all">Mark Served</button>`;
+  } else if (status === 'PREPARING') {
+    actionDiv.innerHTML = `<button onclick="updateStatus(${orderId}, 'READY', this)" class="flex-1 py-2 text-xs font-medium rounded bg-forest/8 border border-forest/20 text-forest hover:bg-forest hover:text-white hover:border-forest transition-all">Mark Ready</button>`;
+  } else if (status === 'SERVED') {
+    ticket.remove();
+    updateCounts();
+    return;
   }
   // Update badge
   const badge = ticket.querySelector('.badge');

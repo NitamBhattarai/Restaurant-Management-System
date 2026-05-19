@@ -20,7 +20,7 @@
                class="w-64 pl-9 pr-4 py-1.5 rounded-full bg-[#f4f5f5] text-[13px] text-ink outline-none focus:ring-1 focus:ring-[#114b3e]/20 transition-all"/>
       </div>
       <button class="w-8 h-8 flex items-center justify-center text-muted hover:text-ink transition-colors">🔔</button>
-      <button class="w-8 h-8 flex items-center justify-center text-muted hover:text-ink transition-colors">⚙️</button>
+      <a href="${pageContext.request.contextPath}/admin/settings" class="w-8 h-8 flex items-center justify-center text-muted hover:text-ink transition-colors">⚙️</a>
       <div class="w-7 h-7 rounded-full bg-ink text-white flex items-center justify-center text-[11px] font-bold">
         <c:choose><c:when test="${not empty currentUser.initials}">${currentUser.initials}</c:when><c:otherwise>AU</c:otherwise></c:choose>
       </div>
@@ -119,7 +119,7 @@
                 <c:otherwise>
                    <div class="text-[13px] font-semibold text-ink mb-1">${t.capacity} Guests</div>
                    <div class="text-[11px] text-muted mb-4">Started: 12:45 PM</div>
-                   <div class="text-[14px] font-bold text-ink mb-4">रू 5,420.00</div>
+                   <div class="text-[14px] font-bold text-ink mb-4">रू <fmt:formatNumber value="${orderTotals[t.tableNumber] != null ? orderTotals[t.tableNumber] : 0}" pattern="#,##0.00"/></div>
                    <a href="${pageContext.request.contextPath}/admin/billing?table=${t.tableNumber}"
                       class="block text-center text-[12px] font-semibold py-2 rounded transition-colors
                              ${t.status.name() == 'OCCUPIED' ? 'bg-[#114b3e] text-white hover:bg-[#0e3b31]' : 'bg-orange-500 text-white hover:bg-orange-600'}">

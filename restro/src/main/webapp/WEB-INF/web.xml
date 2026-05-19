@@ -8,17 +8,27 @@
     <display-name>Gokyo Bistro - Restaurant QR Ordering System</display-name>
     <description>CS5054NT Advanced Programming Technologies Coursework</description>
 
-    <!-- ── Welcome page ── -->
+    <!-- Upload directory for menu images. Survives WAR redeployment. -->
+    <!-- Override this to point to a custom path, e.g. /var/restaurant/uploads/menu. -->
+    <!-- Defaults to ${user.home}/restaurant-uploads/menu when not set. -->
+    <!--
+    <context-param>
+        <param-name>uploadDir</param-name>
+        <param-value>/var/restaurant/uploads/menu</param-value>
+    </context-param>
+    -->
+
+    <!-- Welcome page -->
     <welcome-file-list>
         <welcome-file>index.jsp</welcome-file>
     </welcome-file-list>
 
-    <!-- ── Session timeout: 8 hours ── -->
+    <!-- Session timeout: 8 hours -->
     <session-config>
         <session-timeout>480</session-timeout>
     </session-config>
 
-    <!-- ── Error pages ── -->
+    <!-- Error pages -->
     <error-page>
         <error-code>404</error-code>
         <location>/pages/errorpages/error404.jsp</location>
@@ -32,7 +42,7 @@
         <location>/pages/errorpages/error403.jsp</location>
     </error-page>
 
-    <!-- ── Character encoding filter ── -->
+    <!-- Character encoding filter -->
     <filter>
         <filter-name>CharsetFilter</filter-name>
         <filter-class>com.restaurantManagementSystem.filter.CharsetFilter</filter-class>
@@ -46,7 +56,7 @@
         <url-pattern>/*</url-pattern>
     </filter-mapping>
 
-    <!-- ── Servlet mappings ── -->
+    <!-- Servlet mappings -->
     <servlet>
         <servlet-name>AuthController</servlet-name>
         <servlet-class>com.restaurantManagementSystem.controller.AuthServlet</servlet-class>
@@ -57,6 +67,16 @@
         <url-pattern>/admin/logout</url-pattern>
         <url-pattern>/kitchen/login</url-pattern>
         <url-pattern>/kitchen/logout</url-pattern>
+    </servlet-mapping>
+
+    <!-- Image servlet: serves uploaded menu item photos -->
+    <servlet>
+        <servlet-name>ImageServlet</servlet-name>
+        <servlet-class>com.restaurantManagementSystem.controller.ImageServlet</servlet-class>
+    </servlet>
+    <servlet-mapping>
+        <servlet-name>ImageServlet</servlet-name>
+        <url-pattern>/menu-image</url-pattern>
     </servlet-mapping>
 
     <servlet>
@@ -113,7 +133,9 @@
         <url-pattern>/customer/menu</url-pattern>
         <url-pattern>/customer/order</url-pattern>
         <url-pattern>/customer/bill</url-pattern>
-        <url-pattern>/customer/reservation</url-pattern>        <url-pattern>/customer/feedback</url-pattern>    </servlet-mapping>
+        <url-pattern>/customer/reservation</url-pattern>
+        <url-pattern>/customer/feedback</url-pattern>
+    </servlet-mapping>
 
     <servlet>
         <servlet-name>PaymentController</servlet-name>
