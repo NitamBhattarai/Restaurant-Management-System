@@ -87,15 +87,39 @@
                           data-active="${u.active ? '1' : '0'}"
                           onclick="openEditUserModal(this)">Edit</button>
                   <c:if test="${u.id != currentUser.id}">
-                    <form method="POST" action="${pageContext.request.contextPath}/admin/users"
-                          onsubmit="return confirm('Deactivate ${u.fullName}?')" style="display:inline">
-                      <input type="hidden" name="action" value="deactivate">
-                      <input type="hidden" name="userId" value="${u.id}">
-                      <button type="submit"
-                              class="text-xs bg-red-50 border border-red-200 text-red-700 px-3 py-1.5 rounded hover:bg-red-600 hover:text-white transition-all">
-                        ${u.active ? 'Deactivate' : 'Deleted'}
-                      </button>
-                    </form>
+                    <c:choose>
+                      <c:when test="${u.active}">
+                        <form method="POST" action="${pageContext.request.contextPath}/admin/users"
+                              onsubmit="return confirm('Deactivate ${u.fullName}?')" style="display:inline">
+                          <input type="hidden" name="action" value="deactivate">
+                          <input type="hidden" name="userId" value="${u.id}">
+                          <button type="submit"
+                                  class="text-xs bg-red-50 border border-red-200 text-red-700 px-3 py-1.5 rounded hover:bg-red-600 hover:text-white transition-all">
+                            Deactivate
+                          </button>
+                        </form>
+                      </c:when>
+                      <c:otherwise>
+                        <form method="POST" action="${pageContext.request.contextPath}/admin/users"
+                              onsubmit="return confirm('Reactivate ${u.fullName}?')" style="display:inline">
+                          <input type="hidden" name="action" value="reactivate">
+                          <input type="hidden" name="userId" value="${u.id}">
+                          <button type="submit"
+                                  class="text-xs bg-green-50 border border-green-200 text-green-700 px-3 py-1.5 rounded hover:bg-green-600 hover:text-white transition-all">
+                            Reactivate
+                          </button>
+                        </form>
+                        <form method="POST" action="${pageContext.request.contextPath}/admin/users"
+                              onsubmit="return confirm('Permanently delete ${u.fullName}? This cannot be undone.')" style="display:inline">
+                          <input type="hidden" name="action" value="delete">
+                          <input type="hidden" name="userId" value="${u.id}">
+                          <button type="submit"
+                                  class="text-xs bg-red-50 border border-red-200 text-red-700 px-3 py-1.5 rounded hover:bg-red-600 hover:text-white transition-all">
+                            Delete
+                          </button>
+                        </form>
+                      </c:otherwise>
+                    </c:choose>
                   </c:if>
                 </div>
               </td>

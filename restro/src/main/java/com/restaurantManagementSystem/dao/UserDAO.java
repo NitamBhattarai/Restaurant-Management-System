@@ -124,6 +124,26 @@ public class UserDAO {
         }
     }
 
+    /** Reactivate: mark user active. */
+    public boolean reactivate(int userId) throws SQLException {
+        String sql = "UPDATE users SET active=1 WHERE id=?";
+        try (Connection c = DBConnection.getConnection();
+             PreparedStatement ps = c.prepareStatement(sql)) {
+            ps.setInt(1, userId);
+            return ps.executeUpdate() > 0;
+        }
+    }
+
+    /** Delete a user account permanently from database. */
+    public boolean delete(int userId) throws SQLException {
+        String sql = "DELETE FROM users WHERE id=?";
+        try (Connection c = DBConnection.getConnection();
+             PreparedStatement ps = c.prepareStatement(sql)) {
+            ps.setInt(1, userId);
+            return ps.executeUpdate() > 0;
+        }
+    }
+
     // ── VALIDATION ────────────────────────────────────────────────────────
 
     public boolean usernameExists(String username) throws SQLException {

@@ -49,17 +49,19 @@ public class CustomerServlet extends HttpServlet {
 
                 case "/customer/menu": {
                     String token = req.getParameter("table");
-                    req.setAttribute("previewMode", token == null || token.isBlank());
-                    if (token != null && !token.isBlank()) {
-                        DiningTable table = tableDAO.findByQrToken(token);
-                        if (table == null) {
-                            req.setAttribute("error", "Invalid QR code. Please scan your table's code again.");
-                            req.setAttribute("tables", tableDAO.findAll());
-                            forward(req, resp, "/pages/customer/scan.jsp");
-                            return;
-                        }
-                        req.setAttribute("table", table);
+                    if (token == null || token.isBlank()) {
+                        resp.sendRedirect(req.getContextPath() + "/customer/scan");
+                        return;
                     }
+                    DiningTable table = tableDAO.findByQrToken(token);
+                    if (table == null) {
+                        req.setAttribute("error", "Invalid QR code. Please scan your table's code again.");
+                        req.setAttribute("tables", tableDAO.findAll());
+                        forward(req, resp, "/pages/customer/scan.jsp");
+                        return;
+                    }
+                    req.setAttribute("previewMode", false);
+                    req.setAttribute("table", table);
                     Map<String, List<MenuItem>> groupedMenu = menuDAO.findGroupedByCategory();
                     req.setAttribute("menuByCategory", groupedMenu);
                     req.setAttribute("categoryEntries", new ArrayList<>(groupedMenu.entrySet()));

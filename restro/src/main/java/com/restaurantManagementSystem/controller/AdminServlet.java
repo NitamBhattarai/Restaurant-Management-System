@@ -67,6 +67,15 @@ public class AdminServlet extends HttpServlet {
                         Order firstOrder = activeOrders.get(0);
                         firstOrder.setItems(orderDAO.findOrderItems(firstOrder.getId()));
                     }
+                    java.util.Map<String, BigDecimal> orderTotals = new java.util.HashMap<>();
+                    BillDAO bDaoDashboard = new BillDAO();
+                    for (Order o : activeOrders) {
+                        Bill b = bDaoDashboard.createForOrderIfMissing(o.getId());
+                        if (b != null) {
+                            orderTotals.put(o.getTableNumber(), b.getTotal());
+                        }
+                    }
+                    req.setAttribute("orderTotals", orderTotals);
                     req.setAttribute("orders", activeOrders);
                     req.setAttribute("tables", tableDAO.findAll());
                     req.setAttribute("todayRevenue", orderDAO.getTodayRevenue());
@@ -372,9 +381,42 @@ public class AdminServlet extends HttpServlet {
             throws Exception {
         if ("create".equals(action)) {
             String num = req.getParameter("tableNumber");
-            int cap = Integer.parseInt(req.getParameter("capacity"));
-            tableDAO.create(num, cap);
-            setFlash(req, "success", "Table added successfully.");
+            String capacityStr = req.getParameter("capacity");
+            if (num == null || num.isBlank() || capacityStr == null || capacityStr.isBlank()) {
+                setFlash(req, "error", "Table number and capacity are required.");
+            } else {
+                try {
+                    String cleanNum = num.trim();
+                    if (tableDAO.existsTableNumber(cleanNum)) {
+                        setFlash(req, "error", "Table number already exists.");
+                    } else {
+                        int cap = Integer.parseInt(capacityStr.trim());
+                        tableDAO.create(cleanNum, cap);
+                        setFlash(req, "success", "Table added successfully.");
+                    }
+                } catch (NumberFormatException e) {
+                    setFlash(req, "error", "Capacity must be a valid number.");
+                }
+            }
+        } else if ("delete".equals(action)) {
+            String idStr = req.getParameter("tableId");
+            if (idStr != null && !idStr.isBlank()) {
+                int id = Integer.parseInt(idStr);
+                // Check if table has active orders
+                if (!orderDAO.findActiveByTableId(id).isEmpty()) {
+                    setFlash(req, "error", "Cannot delete table with active orders.");
+                } else {
+                    try {
+                        if (tableDAO.delete(id)) {
+                            setFlash(req, "success", "Table deleted successfully.");
+                        } else {
+                            setFlash(req, "error", "Table not found.");
+                        }
+                    } catch (Exception e) {
+                        setFlash(req, "error", "This table has order history and cannot be deleted.");
+                    }
+                }
+            }
         }
         resp.sendRedirect(req.getContextPath() + "/admin/tables");
     }
@@ -405,7 +447,7 @@ public class AdminServlet extends HttpServlet {
                     break;
                 }
                 if (userDAO.emailExists(email.trim())) {
-                    setFlash(req, "error", "Email already in use.");
+                    setFlash(req, "error", "Email already exists.");
                     break;
                 }
 
@@ -421,6 +463,52 @@ public class AdminServlet extends HttpServlet {
                 break;
             }
 
+            case "update": {
+                int userId = Integer.parseInt(req.getParameter("userId"));
+                String fullName = req.getParameter("fullName");
+                String email = req.getParameter("email");
+                String roleStr = req.getParameter("role");
+                boolean active = req.getParameter("active") != null;
+
+                // Validation
+                if (fullName == null || fullName.isBlank()) {
+                    setFlash(req, "error", "Full Name is required.");
+                    break;
+                }
+                if (email == null || email.isBlank()) {
+                    setFlash(req, "error", "Email is required.");
+                    break;
+                }
+
+                User existing = userDAO.findById(userId);
+                if (existing == null) {
+                    setFlash(req, "error", "User not found.");
+                    break;
+                }
+
+                // Check if email already exists on another user
+                if (!email.trim().equalsIgnoreCase(existing.getEmail()) && userDAO.emailExists(email.trim())) {
+                    setFlash(req, "error", "Email already exists.");
+                    break;
+                }
+
+                // Check self deactivation
+                User current = (User) req.getSession().getAttribute("currentUser");
+                if (current != null && current.getId() == userId && !active) {
+                    setFlash(req, "error", "You cannot deactivate your own account.");
+                    break;
+                }
+
+                existing.setFullName(fullName.trim());
+                existing.setEmail(email.trim());
+                existing.setRole(User.Role.valueOf(roleStr));
+                existing.setActive(active);
+
+                userDAO.update(existing);
+                setFlash(req, "success", "User updated: " + existing.getFullName());
+                break;
+            }
+
             case "deactivate": {
                 int userId = Integer.parseInt(req.getParameter("userId"));
                 User current = (User) req.getSession().getAttribute("currentUser");
@@ -430,6 +518,29 @@ public class AdminServlet extends HttpServlet {
                 }
                 userDAO.deactivate(userId);
                 setFlash(req, "success", "User deactivated.");
+                break;
+            }
+
+            case "reactivate": {
+                int userId = Integer.parseInt(req.getParameter("userId"));
+                userDAO.reactivate(userId);
+                setFlash(req, "success", "User reactivated successfully.");
+                break;
+            }
+
+            case "delete": {
+                int userId = Integer.parseInt(req.getParameter("userId"));
+                User current = (User) req.getSession().getAttribute("currentUser");
+                if (current != null && current.getId() == userId) {
+                    setFlash(req, "error", "You cannot delete your own account.");
+                    break;
+                }
+                try {
+                    userDAO.delete(userId);
+                    setFlash(req, "success", "User deleted successfully.");
+                } catch (Exception e) {
+                    setFlash(req, "error", "Failed to delete user: " + e.getMessage());
+                }
                 break;
             }
         }

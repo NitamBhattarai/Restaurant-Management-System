@@ -79,6 +79,16 @@
         <url-pattern>/menu-image</url-pattern>
     </servlet-mapping>
 
+    <!-- QR servlet: renders scannable table menu QR codes -->
+    <servlet>
+        <servlet-name>TableQrServlet</servlet-name>
+        <servlet-class>com.restaurantManagementSystem.controller.TableQrServlet</servlet-class>
+    </servlet>
+    <servlet-mapping>
+        <servlet-name>TableQrServlet</servlet-name>
+        <url-pattern>/table-qr</url-pattern>
+    </servlet-mapping>
+
     <servlet>
         <servlet-name>AdminController</servlet-name>
         <servlet-class>com.restaurantManagementSystem.controller.AdminServlet</servlet-class>

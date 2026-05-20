@@ -100,6 +100,31 @@ public class TableDAO {
         return -1;
     }
 
+    /** Check if table number already exists. */
+    public boolean existsTableNumber(String tableNumber) throws SQLException {
+        String sql = "SELECT COUNT(*) FROM dining_tables WHERE table_number = ?";
+        try (Connection conn = DBConnection.getConnection();
+             PreparedStatement ps = conn.prepareStatement(sql)) {
+            ps.setString(1, tableNumber);
+            try (ResultSet rs = ps.executeQuery()) {
+                if (rs.next()) {
+                    return rs.getInt(1) > 0;
+                }
+            }
+        }
+        return false;
+    }
+
+    /** Delete a table. */
+    public boolean delete(int id) throws SQLException {
+        String sql = "DELETE FROM dining_tables WHERE id = ?";
+        try (Connection conn = DBConnection.getConnection();
+             PreparedStatement ps = conn.prepareStatement(sql)) {
+            ps.setInt(1, id);
+            return ps.executeUpdate() > 0;
+        }
+    }
+
     // ── MAPPER ────────────────────────────────────────────
 
     private DiningTable mapRow(ResultSet rs) throws SQLException {

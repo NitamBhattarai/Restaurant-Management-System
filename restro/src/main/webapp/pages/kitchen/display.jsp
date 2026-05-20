@@ -5,12 +5,7 @@
 <c:set var="pageTitle" value="Kitchen Display"/>
 <%@ include file="/pages/errorpages/header.jsp" %>
 
-<!-- ╔═══════════════════════════════════════════════════════════╗
-     ║  VIEW: kitchen/display.jsp                               ║
-     ║  Controller: KitchenController.java                      ║
-     ║  Model: Order.java, OrderItem.java                       ║
-     ║  AJAX POST → /kitchen/update → JSON response            ║
-     ╚═══════════════════════════════════════════════════════════╝ -->
+
 
 <!-- TOP NAV — same brand, same height as every page -->
 <nav class="bg-white/96 backdrop-blur-md border-b border-black/10 h-16 flex items-center justify-between px-8 sticky top-0 z-50">
